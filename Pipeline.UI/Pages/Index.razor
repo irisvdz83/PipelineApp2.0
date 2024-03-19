@@ -1,0 +1,15 @@
+﻿@page "/"
+
+
+<PageTitle>Today</PageTitle>
+
+@if (PipelineTimer is not null && IsRunning)
+{
+    <span @onclick="@ToggleTimer"><i class="oi oi-media-pause"></i></span>
+    <span @onclick="@StopTimer"><i class="oi oi-media-stop"></i></span>
+}
+else
+{
+    <span @onclick="@ToggleTimer"><i class="oi oi-play-circle"></i></span>
+}
+<span> Time worked today: @(ElapsedTime)</span>
