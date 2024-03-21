@@ -397,3 +397,5 @@ Common/src/Lansweeper.Discovery.Hub/JsonSync/
 
 OT/src/Lansweeper.OT.Simulator.SensorSetup/ImportScanTargets.csv
 /Common/src/Lansweeper.Discovery.Hub/ssl/*
+
+*.db-journal

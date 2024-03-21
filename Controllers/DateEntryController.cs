@@ -17,7 +17,7 @@ public class DateEntryController : IDateEntryController
     {
         try
         {
-            var today = _dbContext.DateEntries.FirstOrDefault(x => x.StartTime.Date.Equals(DateTime.Today.Date));
+            var today = _dbContext.DateEntries.Where(x => x.StartTime.Date.Equals(DateTime.Today.Date)).OrderByDescending(x => x.StartTime).FirstOrDefault();
             if (today is null)
             {
                 today = new DateEntry { StartTime = DateTime.Now };
@@ -34,16 +34,29 @@ public class DateEntryController : IDateEntryController
             return new DateEntry();
         }
     }
-    public DateEntry? AddNewStartTime(DateTime startTime)
+    public DateEntry? AddNewStartTime(Guid dateId, DateTime startTime)
     {
         try
         {
-            var newTodayEntry = new DateEntry { StartTime = startTime };
-            var savedEntity = _dbContext.Add(newTodayEntry);
-            _dbContext.SaveChanges();
-            _logger.LogDebug("Adding or updating today entry successful.");
-            newTodayEntry = savedEntity.Entity;
-            return newTodayEntry;
+            var savedTodayEntry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == dateId);
+            if (savedTodayEntry?.EndTime is not null)
+            {
+                var newTodayEntry = new DateEntry { StartTime = startTime };
+                var savedEntity = _dbContext.Add(newTodayEntry);
+                _dbContext.SaveChanges();
+                _logger.LogDebug("Adding today entry successful.");
+                newTodayEntry = savedEntity.Entity;
+                return newTodayEntry;
+            }
+
+            if(savedTodayEntry is not null)
+            {
+                savedTodayEntry.StartTime = startTime;
+                _dbContext.Update(savedTodayEntry);
+                _dbContext.SaveChanges();
+                _logger.LogDebug("Updating today entry successful.");
+               return savedTodayEntry;
+            }
         }
         catch (Exception ex)
         {
@@ -52,15 +65,16 @@ public class DateEntryController : IDateEntryController
 
         return null;
     }
-    public bool UpdateEndTime(Guid dateId)
+    public bool UpdateEndTime(Guid dateId, DateTime endTime)
     {
         try
         {
             var savedTodayEntry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == dateId);
             if (savedTodayEntry is not null)
             {
-                savedTodayEntry = new DateEntry { StartTime = DateTime.Now };
+                savedTodayEntry.EndTime = endTime;
                 _dbContext.Update(savedTodayEntry);
+                _dbContext.SaveChanges();
             }
 
             _logger.LogDebug("Updating today end time successful.");
@@ -71,5 +85,16 @@ public class DateEntryController : IDateEntryController
             _logger.LogError(ex, "Something went wrong in the {method}.", nameof(UpdateEndTime));
             return false;
         }
+    }
+
+    public TimeSpan GetTotalWorkedTimeToday()
+    {
+        var today = _dbContext.DateEntries.Where(x => x.StartTime.Date.Equals(DateTime.Today.Date) && x.EndTime.HasValue).OrderByDescending(x => x.StartTime);
+        TimeSpan totalWorkedTime = default;
+        foreach (var todayEntry in today)
+        {
+            totalWorkedTime += todayEntry.EndTime!.Value - todayEntry.StartTime;
+        }
+        return totalWorkedTime;
     }
 }

@@ -5,6 +5,7 @@ namespace PipelineApp2._0.Controllers;
 public interface IDateEntryController
 {
     DateEntry GetToday();
-    DateEntry? AddNewStartTime(DateTime startTime);
-    bool UpdateEndTime(Guid dateId);
+    DateEntry? AddNewStartTime(Guid dateId, DateTime startTime);
+    bool UpdateEndTime(Guid dateId, DateTime endTime);
+    TimeSpan GetTotalWorkedTimeToday();
 }
