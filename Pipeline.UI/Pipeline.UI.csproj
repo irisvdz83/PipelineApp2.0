@@ -15,4 +15,8 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\PipelineService\PipelineService.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Controllers\" />
+	</ItemGroup>
 </Project>

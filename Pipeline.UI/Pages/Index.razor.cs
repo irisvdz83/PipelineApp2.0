@@ -1,12 +1,20 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Pipeline.UI.ViewModels;
 
 namespace Pipeline.UI.Pages
 {
     public partial class Index : ComponentBase
     {
-        private string? _elapsedTime;
-        private DateTime? _startTime;
-        private DateTime? _endTime;
+        private string? _elapsedTime ;
+        private DateEntryViewModel CurrentDateEntryViewModel { get; set; } = null!;
+
+        protected override void OnInitialized()
+        {
+            var today = DateController.GetToday();
+            CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(today);
+            
+            base.OnInitialized();
+        }
 
         public string? ElapsedTime
         {
@@ -35,7 +43,8 @@ namespace Pipeline.UI.Pages
             {
                 IsRunning = true;
                 TimeSpan ??= new TimeSpan(0, 0, 0);
-                _startTime = DateTime.Now;
+                CurrentDateEntryViewModel.StartTime = DateTime.Now;
+                DateController.AddNewStartTime(CurrentDateEntryViewModel.StartTime);
                 PipelineTimer = new Timer(_ =>
                 {
                     Seconds += 1;
@@ -56,7 +65,8 @@ namespace Pipeline.UI.Pages
             IsRunning = false;
             PipelineTimer.Dispose();
             PipelineTimer = null;
-            _endTime = DateTime.Now;
+            CurrentDateEntryViewModel.EndTime = DateTime.Now;
+            DateController.UpdateEndTime(CurrentDateEntryViewModel.Id);
         }
     }
 }
