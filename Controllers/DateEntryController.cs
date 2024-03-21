@@ -97,4 +97,10 @@ public class DateEntryController : IDateEntryController
         }
         return totalWorkedTime;
     }
+
+    public List<DateEntry> GetAllEntriesForToday()
+    {
+        var today = _dbContext.DateEntries.Where(x => x.StartTime.Date.Equals(DateTime.Today.Date) && x.EndTime.HasValue).OrderByDescending(x => x.StartTime);
+        return today.ToList();
+    }
 }

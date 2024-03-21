@@ -14,5 +14,27 @@ else
     <span @onclick="@ToggleTimer"><i class="oi oi-play-circle"></i></span>
 }
 <span> Time worked current time block: @(ElapsedTimeCurrentTimeBlock)</span>
-
+<br/>
+<br/>
 <span> Total time worked today: @(ElapsedTotalTime)</span>
+<hr/>
+@if (TodaysEntries.Any())
+{
+    
+    <h1>Today @TodaysEntries.FirstOrDefault()!.StartTime.ToShortDateString()</h1>
+    <table>
+        @foreach (var entry in TodaysEntries)
+        {
+            <tr>
+                <td>@entry.StartTime</td>
+                <td>@entry.EndTime</td>
+            </tr>
+            <tr>
+                <td>@entry.Description</td>
+            </tr>
+            <tr>
+                <td>@entry.Tags</td>
+            </tr>
+        }
+    </table>
+}

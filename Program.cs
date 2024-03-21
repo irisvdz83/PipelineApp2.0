@@ -11,6 +11,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContextFactory<PipelineDbContext>(options => options.UseSqlite(connectionString));
 
 builder.Services.AddTransient<IDateEntryController, DateEntryController>();
+builder.Services.AddTransient<ISettingsController, SettingsController>();
 builder.Services.AddHostedService<PipelineService>();
 
 var app = builder.Build();

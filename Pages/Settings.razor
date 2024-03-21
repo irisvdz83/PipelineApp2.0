@@ -1,10 +1,107 @@
 ﻿@page "/settings"
-
+@using PipelineApp2._0.Controllers
+@inject ISettingsController SettingsController
 <PageTitle>Settings</PageTitle>
 
 <h1>Settings</h1>
+<hr/>
+<div>
+   @if (SettingViewModel.WorkingDaysPerWeek.Any())
+   {
+       <h3>Working Days</h3>
+       <table>
+
+           <tr>
+               <td>Monday</td>
+               <td>Tuesday</td>
+               <td>Wednesday</td>
+               <td>Thursday</td>
+               <td>Friday</td>
+               <td>Saturday</td>
+               <td>Sunday</td>
+           </tr>
+            <tr>
+                <td>
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Monday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Monday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Monday))" />
+                    }
+                </td>
+                <td>
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Tuesday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Tuesday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Tuesday))" />
+                    }
+                </td>
+                <td>
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Wednesday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Wednesday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Wednesday))" />
+                    }
+                </td>
+                <td>
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Thursday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Thursday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Thursday))" />
+                    }
+                </td>
+                <td>
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Friday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Friday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Friday))" />
+                    }
+                </td>
+                <td>
+
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Saturday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Saturday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Saturday))" />
+                    }
+                </td>
+                <td>
+                    @if (SettingViewModel.WorkingDaysPerWeek.Contains((int)DayOfWeek.Sunday))
+                    {
+                        <input type="checkbox" checked="@true" @onchange="@(() => ToggleDay(DayOfWeek.Sunday))" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" checked="@false" @onchange="@(() => ToggleDay(DayOfWeek.Sunday))" />
+                    }
+                </td>
+            </tr>
+
+        </table>
+   }
+   <hr/>
+   <h3>Working Hours</h3>
+   <div>
+       <span>Days worked per day</span> <input type="number"@bind="SettingViewModel.WorkingHoursPerDay" />
+   </div>
+   <button @onclick="SaveChanges">Save changes</button>
+</div>
 
 
-@code {
-   
-}

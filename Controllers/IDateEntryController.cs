@@ -8,4 +8,5 @@ public interface IDateEntryController
     DateEntry? AddNewStartTime(Guid dateId, DateTime startTime);
     bool UpdateEndTime(Guid dateId, DateTime endTime);
     TimeSpan GetTotalWorkedTimeToday();
+    List<DateEntry> GetAllEntriesForToday();
 }
