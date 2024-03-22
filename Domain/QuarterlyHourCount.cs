@@ -9,6 +9,7 @@ public class QuarterlyHourCount : IDbEntity
 
     public override string ToString()
     {
+        if(Hours == 0) return "00:00";
         var hourString = $"{Hours:f2}";
         var decimalParts = hourString.Split(',');
 
