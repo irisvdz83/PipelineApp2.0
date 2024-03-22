@@ -1,9 +1,9 @@
 ﻿namespace PipelineApp2._0.Domain
 {
-    public class Tag
+    public class Tag : IDbEntity
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Colour { get; set; }
+        public string Name { get; set; } = null!;
+        public string Colour { get; set; } = null!;
     }
 }

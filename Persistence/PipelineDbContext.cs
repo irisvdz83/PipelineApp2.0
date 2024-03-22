@@ -10,6 +10,7 @@ public class PipelineDbContext : DbContext
     public DbSet<DateEntry> DateEntries { get; set; } = null!;
     public DbSet<Setting> Settings { get; set; } = null!;
     public DbSet<WeekDay> WeekDays { get; set; } = null!;
+    public DbSet<QuarterlyHourCount> QuarterlyHours { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public PipelineDbContext(IConfiguration configuration)
     {

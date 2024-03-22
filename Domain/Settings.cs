@@ -1,6 +1,6 @@
 ﻿namespace PipelineApp2._0.Domain;
 
-public class Setting
+public class Setting : IDbEntity
 {
     public Guid Id { get; set; }
     public List<WeekDay> WeekDays { get; set; } = new();

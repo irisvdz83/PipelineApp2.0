@@ -1,6 +1,6 @@
 ﻿namespace PipelineApp2._0.Domain;
 
-public class DateEntry
+public class DateEntry : IDbEntity
 {
     public Guid Id { get; set; }
     public DateTime StartTime { get; set; }

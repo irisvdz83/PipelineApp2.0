@@ -1,4 +1,5 @@
-﻿using PipelineApp2._0.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using PipelineApp2._0.Domain;
 using PipelineApp2._0.Persistence;
 
 namespace PipelineApp2._0.Services;
@@ -34,7 +35,7 @@ public sealed class PipelineService : BackgroundService
                 var dbContext = scope.ServiceProvider.GetRequiredService<PipelineDbContext>();
                 GetOrCreateEntryForToday(dbContext);
 
-                await Task.Delay(TimeSpan.FromHours(24), cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
             }
             catch (OperationCanceledException ex) // includes TaskCanceledException
             {
@@ -60,6 +61,7 @@ public sealed class PipelineService : BackgroundService
         {
             var today = dbContext.DateEntries.FirstOrDefault(x => x.StartTime.Date.Equals(DateTime.Today.Date));
             if (today != null) return today;
+            CalculateQuarterlyHours(dbContext);
             today = new DateEntry { StartTime = DateTime.Today };
             dbContext.Add(today);
             dbContext.SaveChanges();
@@ -71,5 +73,45 @@ public sealed class PipelineService : BackgroundService
             _logger.LogError(ex, "Error occurred in method {name}.", nameof(GetOrCreateEntryForToday));
             return null;
         }
+    }
+
+    private void CalculateQuarterlyHours(PipelineDbContext dbContext)
+    {
+        var previousDays = dbContext.DateEntries.Where(x => x.StartTime.Date < DateTime.Today.Date && x.EndTime != null).GroupBy(x => x.StartTime.Date);
+        var workingDays = dbContext.WeekDays;
+        var savedQuarterlyHours = dbContext.QuarterlyHours.FirstOrDefault();
+        var quarterlyHours = savedQuarterlyHours?.Hours ?? 0;
+
+        foreach (var day in previousDays)
+        {
+            var dayOfWeek = workingDays.FirstOrDefault(x => x.DayOfWeek == (int)day.Key.DayOfWeek);
+            if (dayOfWeek is null) continue;
+            var dayTimeBlocks = day.ToList();
+            TimeSpan timeWorked = default;
+            foreach (var timeBlock in dayTimeBlocks)
+            {
+                if (timeBlock.StartTime is { Hour: 0, Minute: 0, Second: 0 } && timeBlock.EndTime is { Hour: 23, Minute: 59, Second: 59 } && !dayOfWeek.IsWorkDay) continue;
+                timeWorked += timeBlock.EndTime!.Value - timeBlock.StartTime;
+            }
+            var timeWorkedInHours = float.Parse($"{timeWorked.Hours},{timeWorked.Minutes}");
+            var timeHasToBeWorked = float.Parse($"{dayOfWeek.Hours},{dayOfWeek.Minutes}");
+            quarterlyHours += timeWorkedInHours - timeHasToBeWorked;
+        }
+
+        if (savedQuarterlyHours is null)
+        {
+            dbContext.QuarterlyHours.Add(new QuarterlyHourCount
+            {
+                Hours = quarterlyHours
+            });
+        }
+        else
+        {
+            savedQuarterlyHours.Hours = Math.Round(quarterlyHours, 2);
+            dbContext.QuarterlyHours.Update(savedQuarterlyHours);
+        }
+
+        dbContext.SaveChanges();
+
     }
 }
