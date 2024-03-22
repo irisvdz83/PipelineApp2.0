@@ -1,5 +1,7 @@
-﻿using PipelineApp2._0.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using PipelineApp2._0.Domain;
 using PipelineApp2._0.Persistence;
+using PipelineApp2._0.ViewModels;
 
 namespace PipelineApp2._0.Controllers;
 
@@ -93,35 +95,26 @@ public class SettingsController : ISettingsController
         }
     }
 
-    /*public async Task ToggleDay(DayOfWeek dayOfWeek)
+    public void SaveSettings(List<WeekDay> weekDays)
     {
-        var settings = _dbContext.Settings.FirstOrDefault();
-        if (!settings!.WeekDays.Contains((int)dayOfWeek))
+        var existingWeekDays = _dbContext.WeekDays.ToList();
+        weekDays.ForEach(item =>
         {
-            settings.WeekDays.Add((int)dayOfWeek);
-        }
-        else
-        {
-            settings.WeekDays.Remove((int)dayOfWeek);
-        }
-        _dbContext.Update(settings);
-        await _dbContext.SaveChangesAsync();
+            var existing = existingWeekDays.First(x => x.Id == item.Id);
+            existing.IsWorkDay = item.IsWorkDay;
+            existing.Hours = item.Hours;
+            existing.Minutes = item.Minutes;
+        });
+        _dbContext.UpdateRange(existingWeekDays);
+        _dbContext.SaveChanges();
     }
 
-    public async Task SetWorkingHoursPerDay(int workingHoursPerDay)
-    {
-        var settings = _dbContext.Settings.FirstOrDefault();
-        settings!.WorkingHoursPerDay = workingHoursPerDay;
-        _dbContext.Update(settings);
-        await _dbContext.SaveChangesAsync();
-    }
-
-    public void SaveSettings(Setting setting)
+    public void SaveSettings(SettingViewModel settings)
     {
         var savedSetting = _dbContext.Settings.FirstOrDefault();
-        savedSetting!.WorkingHoursPerDay = setting.WorkingHoursPerDay;
-        savedSetting.WeekDays = setting.WeekDays;
+        savedSetting!.AddLunchBreaks = settings.AddLunchBreaks;
+        savedSetting.LunchBreakInMinutes = settings.LunchBreakInMinutes;
         _dbContext.Update(savedSetting);
         _dbContext.SaveChanges();
-    }*/
+    }
 }

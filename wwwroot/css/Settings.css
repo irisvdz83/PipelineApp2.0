@@ -4,14 +4,15 @@
 
 article {
     margin: 20px;
+    position: relative;
 }
 
-    article.greyBlock {
-        background-color: #E9EAEA;
-        border-radius: 5px;
-        padding: 25px;
-        box-shadow: 4px 1px 10px #cccccc;
-    }
+article.greyBlock {
+    background-color: #E9EAEA;
+    border-radius: 5px;
+    padding: 25px;
+    box-shadow: 4px 1px 10px #cccccc;
+}
 
 input[type="number"] {
     width: 35px;
