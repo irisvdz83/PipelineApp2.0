@@ -52,34 +52,44 @@
         {
             <h1><b>@TodaysEntries.FirstOrDefault()!.StartTime.DayOfWeek</b> @TodaysEntries.FirstOrDefault()!.StartTime.ToString("MMMM d, yyyy")</h1>
             <div style="display: flex; flex-direction: row;">
-                <article style="width: 10%; " class="greyBlock">
-                    <b>M</b><br />
-                    00:00:00
-                </article>
-                <article style="width: 10%;" class="greyBlock">
-                    <b>T</b><br />
-                    00:00:00
-                </article>
-                <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>W</b><br />
-                    00:00:00
-                </article>
-                <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>Th</b><br />
-                    @(ElapsedTotalTime)
-                </article>
-                <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>F</b><br />
-                    00:00:00
-                </article>
-                <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>Sa</b><br />
-                    00:00:00
-                </article>
-                <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>Su</b><br />
-                    00:00:00
-                </article>
+                @foreach(var previousDay in PreviousDaysWorkHours)
+                {
+                    <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek == Today ? "darkGreyBlock" : "greyBlock")">
+                        @switch (previousDay.Key.Id)
+                        {
+                            case 1:
+                                <b>Mo</b><br/>
+                                break;
+                            case 2:
+                                <b>Tu</b><br/>
+                                break;
+                            case 3:
+                                <b>We</b><br/>
+                                break;
+                            case 4:
+                                <b>Th</b><br/>
+                                break;
+                            case 5:
+                                <b>Fr</b><br/>
+                                break;
+                            case 6:
+                                <b>Sa</b><br/>
+                                break;
+                            case 7:
+                                <b>Su</b><br/>
+                                break;
+                        }
+                        @if (previousDay.Key.DayOfWeek == Today)
+                        {
+                            @(ElapsedTotalTime)
+                        }
+                        else
+                        {
+                            @previousDay.Value
+                        }
+                        
+                    </article>
+                }
             </div>
             <table>
                 @foreach (var entry in TodaysEntries)

@@ -9,4 +9,5 @@ public interface IDateEntryController
     bool UpdateEndTime(Guid dateId, DateTime endTime);
     TimeSpan GetTotalWorkedTimeToday();
     List<DateEntry> GetAllEntriesForToday();
+    Dictionary<WeekDay, string> GetThisWeekPreviousDaysWorkHoursAsString();
 }
