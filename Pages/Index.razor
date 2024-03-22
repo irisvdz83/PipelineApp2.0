@@ -14,7 +14,7 @@
         <h5>Hours: </h5>
         @switch (QuarterlyHours)
         {
-            case > 0 and < 10:
+            case >= 0 and <= 10:
                 <span style="color:green;">@QuarterlyHoursOverview</span>
                 break;
             case > 10:
