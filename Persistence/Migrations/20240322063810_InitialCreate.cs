@@ -17,11 +17,26 @@ namespace PipelineApp2._0.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Tags = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DateEntries", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Settings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WorkingDaysPerWeek = table.Column<string>(type: "TEXT", nullable: false),
+                    WorkingHoursPerDay = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Settings", x => x.Id);
                 });
         }
 
@@ -30,6 +45,9 @@ namespace PipelineApp2._0.Migrations
         {
             migrationBuilder.DropTable(
                 name: "DateEntries");
+
+            migrationBuilder.DropTable(
+                name: "Settings");
         }
     }
 }

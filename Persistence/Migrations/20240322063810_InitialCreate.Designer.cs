@@ -11,7 +11,7 @@ using PipelineApp2._0.Persistence;
 namespace PipelineApp2._0.Migrations
 {
     [DbContext(typeof(PipelineDbContext))]
-    [Migration("20240321131353_InitialCreate")]
+    [Migration("20240322063810_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -26,15 +26,40 @@ namespace PipelineApp2._0.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("DateEntries");
+                });
+
+            modelBuilder.Entity("PipelineApp2._0.Domain.Setting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WorkingDaysPerWeek")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("WorkingHoursPerDay")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
                 });
 #pragma warning restore 612, 618
         }
