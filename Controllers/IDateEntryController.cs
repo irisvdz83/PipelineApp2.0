@@ -10,7 +10,7 @@ public interface IDateEntryController
     TimeSpan GetTotalWorkedTimeToday();
     List<DateEntry> GetAllEntriesForToday();
     Dictionary<WeekDay, string> GetThisWeekPreviousDaysWorkHoursAsString();
-
     void DeleteEntry(Guid id);
     List<Tag> GetAllTags();
+    void UpdateDateEntry(Guid id, DateEntry entry);
 }

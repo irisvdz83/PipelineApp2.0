@@ -3,22 +3,31 @@
 }
 
 article {
-    margin: 20px;
+    margin: 15px;
     position: relative;
+    padding: 25px;
 }
 
-article.greyBlock {
-    background-color: #E9EAEA;
-    border-radius: 5px;
-    padding: 25px;
-    box-shadow: 4px 1px 10px #cccccc;
-}
+    article.greyBlock {
+        background-color: #E9EAEA;
+        border-radius: 5px;
+        box-shadow: 4px 1px 10px #cccccc;
+    }
 
-article.darkGreyBlock {
-    background-color: #ababab;
-    border-radius: 5px;
-    padding: 25px;
-    box-shadow: 4px 1px 10px #cccccc;
+    article.darkGreyBlock {
+        background-color: #ababab;
+        border-radius: 5px;
+        box-shadow: 4px 1px 10px #cccccc;
+    }
+
+    article.greyStripes {
+        background: repeating-linear-gradient( 45deg, #ababab, #ababab 2px, #E9EAEA 2px, #E9EAEA 3px);
+        border-radius: 5px;
+        box-shadow: 4px 1px 10px #cccccc;
+    }
+
+#weekdayDiv{
+    margin-left: -25%
 }
 
 input[type="number"] {

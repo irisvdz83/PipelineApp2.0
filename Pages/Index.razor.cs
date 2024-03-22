@@ -175,6 +175,7 @@ public partial class Index : ComponentBase
     {
         DateEntryController.DeleteEntry(id);
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
+        GetTotalElapsedTime();
     }
 
     private void EditEntry(Guid id)
@@ -186,7 +187,18 @@ public partial class Index : ComponentBase
     {
         EditEntryId = Guid.Empty;
         
-        var entry = TodaysEntries.FirstOrDefault(x => x.Id == id);
-        if (entry is null) return;
+        var entry = TodaysEntries.Find(x => x.Id == id);
+        if(entry is null) return;
+        var selectedTags = Tags.Exists(x =>x.Selected) ? Tags.Where(x=>x.Selected).Select(x => x.Name).ToList() : entry.GetTags();
+        var dateEntry = new DateEntry
+        {
+            Description = entry.Description,
+            StartTime = entry.StartTime,
+            EndTime = entry.EndTime,
+            Tags = selectedTags
+        };
+        DateEntryController.UpdateDateEntry(id, dateEntry);
+        TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
+        GetTotalElapsedTime();
     }
 }

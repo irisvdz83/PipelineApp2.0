@@ -49,7 +49,7 @@
         @if (PipelineTimer is null || !IsRunning)
         {
             <div>
-                <input type="text" @bind="Task" style="width: 75%; border-radius: 16px; margin-left: 5px;" placeholder="Task" />
+                <input type="text" @bind="Task" style="width: 75%; border-radius: 10px; margin-left: 5px;" placeholder=" Task description" />
             </div>
             <div style="display: flex; flex-direction: column; margin-top: 20px;" >
                 @foreach (var tag in Tags)
@@ -74,7 +74,8 @@
             <div style="display: flex; flex-direction: row;">
                 @foreach(var previousDay in PreviousDaysWorkHours)
                 {
-                    <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek == Today ? "darkGreyBlock" : "greyBlock")">
+                    <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek != Today ? (previousDay.Key.IsWorkDay ? "greyBlock" : "greyStripes") : "darkGreyBlock")">
+                        <div id="weekdayDiv">
                         @switch (previousDay.Key.Id)
                         {
                             case 1:
@@ -107,7 +108,7 @@
                         {
                             @previousDay.Value
                         }
-                        
+                        </div>
                     </article>
                 }
             </div>

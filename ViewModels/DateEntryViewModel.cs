@@ -23,4 +23,11 @@ public class DateEntryViewModel
             TotalTime = date.EndTime.HasValue ? date.EndTime - date.StartTime : null
         };
     }
+
+    public List<string> GetTags()
+    {
+        var separateTags = Tags?.Split(',');
+        
+        return separateTags?.ToList() ?? new List<string>();
+    }
 }

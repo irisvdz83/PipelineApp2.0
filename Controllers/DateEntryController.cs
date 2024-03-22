@@ -170,4 +170,15 @@ public class DateEntryController : IDateEntryController
     }
 
     public List<Tag> GetAllTags() => _dbContext.Tags.ToList();
+    public void UpdateDateEntry(Guid id, DateEntry entry)
+    {
+        var savedEntry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == id);
+        if(savedEntry is null) return;
+        savedEntry.StartTime = entry.StartTime;
+        savedEntry.EndTime = entry.EndTime;
+        savedEntry.Description = entry.Description;
+        savedEntry.Tags = entry.Tags;
+        _dbContext.Update(savedEntry);
+        _dbContext.SaveChanges();
+    }
 }
