@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
-using PipelineApp2._0.Controllers;
 using PipelineApp2._0.Domain;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.ViewModels;
@@ -47,11 +46,8 @@ public partial class Index : ComponentBase
     Dictionary<WeekDay, string> PreviousDaysWorkHours { get; set; } = new();
     private int Today { get; set; }
     public string CurrentDescription { get; set; }
-
     public string Task { get; set; }
     public List<Tag> Tags { get; set; }
-
-    public string Output = string.Empty;
     public Guid EditEntryId;
 
     protected override void OnInitialized()
@@ -192,11 +188,5 @@ public partial class Index : ComponentBase
         
         var entry = TodaysEntries.FirstOrDefault(x => x.Id == id);
         if (entry is null) return;
-        //var dateEntry = DateEntryController.GetEntry(id);
-        //if (dateEntry is null) return;
-        //dateEntry.Description = entry.Description;
-        //dateEntry.Tags = entry.Tags.Split(',').ToList();
-        //DateEntryController.UpdateEntry(dateEntry);
-    
     }
 }

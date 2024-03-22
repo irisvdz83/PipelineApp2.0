@@ -134,11 +134,15 @@ public class DateEntryController : IDateEntryController
             }
             result.Add(dayOfWeek, TimeSpanHelper.GetFormattedTimeSpan(timeWorked));
         }
-        var missingDays = 7 - daysTillCurrentDay;
+        var missingDays = 7 - result.Count;
         
-        for (var i = 1; i <= missingDays; i++)
+        if(missingDays == 0) return result;
+
+        for (var i = 1; i <= 7; i++)
         {
-            var today = daysTillCurrentDay + i;
+            if(result.Keys.Any(x => x.Id == i)) continue;
+
+            var today = i;
             var dayOfWeek = workingDays.FirstOrDefault(x => x.Id == today);
             if (dayOfWeek is null) continue;
             result.Add(new WeekDay
