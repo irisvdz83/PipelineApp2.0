@@ -1,4 +1,4 @@
-﻿using PipelineApp2._0.Domain;
+using PipelineApp2._0.Domain;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.Persistence;
 using System;
@@ -152,5 +152,14 @@ public class DateEntryController : IDateEntryController
         }
 
         return result;
+    }
+
+    public void DeleteEntry(Guid id)
+    {
+        var entry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == id);
+        if (entry is null) return;
+
+        _dbContext.Remove(entry);
+        _dbContext.SaveChanges();
     }
 }

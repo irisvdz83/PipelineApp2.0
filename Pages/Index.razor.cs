@@ -46,6 +46,9 @@ public partial class Index : ComponentBase
     Dictionary<WeekDay, string> PreviousDaysWorkHours { get; set; } = new();
     private int Today { get; set; }
 
+    public string Output = string.Empty;
+    public Guid EditEntryId;
+
     protected override void OnInitialized()
     {
         var today = DateEntryController.GetToday();
@@ -130,5 +133,30 @@ public partial class Index : ComponentBase
         Seconds = 0;
         TotalTimeSeconds = 0;
         _elapsedTimeCurrentTimeBlock = "00:00:00";
+    }
+
+    private void DeleteEntry(Guid id)
+    {
+        DateEntryController.DeleteEntry(id);
+        TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
+    }
+
+    private void EditEntry(Guid id)
+    {
+        EditEntryId = id;
+    }
+
+    private void SaveEntry(Guid id)
+    {
+        EditEntryId = Guid.Empty;
+        
+        var entry = TodaysEntries.FirstOrDefault(x => x.Id == id);
+        if (entry is null) return;
+        //var dateEntry = DateEntryController.GetEntry(id);
+        //if (dateEntry is null) return;
+        //dateEntry.Description = entry.Description;
+        //dateEntry.Tags = entry.Tags.Split(',').ToList();
+        //DateEntryController.UpdateEntry(dateEntry);
+    
     }
 }

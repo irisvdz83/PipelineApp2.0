@@ -1,4 +1,4 @@
-﻿using PipelineApp2._0.Domain;
+using PipelineApp2._0.Domain;
 
 namespace PipelineApp2._0.Controllers;
 
@@ -10,4 +10,6 @@ public interface IDateEntryController
     TimeSpan GetTotalWorkedTimeToday();
     List<DateEntry> GetAllEntriesForToday();
     Dictionary<WeekDay, string> GetThisWeekPreviousDaysWorkHoursAsString();
+
+    void DeleteEntry(Guid id);
 }

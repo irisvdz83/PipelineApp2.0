@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using PipelineApp2._0.Controllers
 @inject IDateEntryController DateEntryController
 @inject IQuarterlyHoursController QuarterlyHoursController
@@ -95,16 +95,53 @@
                 @foreach (var entry in TodaysEntries)
                 {
                     <tr>
-                        <td width="70%"><b>@entry.Description</b><br /><i>@entry.Tags</i></td>
-                        <td>@entry.StartTime.ToString("HH:mm") - @entry.EndTime.Value.ToString("HH:mm")</td>
-                        <td><img src="Images/Edit.png" style="width:30px" /> </td>
+                        <td width="70%">
+
+                            @if (!EditEntryId.Equals(entry.Id) )
+                            {
+                                <b>@entry.Description</b>
+                                <br />
+                                <i>@entry.Tags</i>
+                            }
+                            else
+                            {
+                                <input type="text" @bind="entry.Description" />
+                                <br />
+                                <input type="text" @bind="entry.Tags" />
+                            }
+
+                        </td>
                         <td>
-                            <span><img src="Images/Delete.png" width="30px" /></span>
+                            
+                            @if (!EditEntryId.Equals(entry.Id))
+                            {
+                                @($"{entry.StartTime:HH:mm} - {entry.EndTime.Value:HH:mm}");
+
+                            }
+                            else
+                            {
+                                <input type="time" @bind="entry.StartTime" @bind:format="HH:mm:ss" />
+
+                                <input type="time" @bind="entry.EndTime" @bind:format="HH:mm:ss" />
+                                 
+                            }
+                        </td>
+                        <td>
+                            @if (!EditEntryId.Equals(entry.Id) )
+                            {
+                                <span @onclick="() => EditEntry(entry.Id)"><img src="Images/Edit.png" width="30px" /></span>
+                            }
+                            else
+                            {
+                                <button @onclick="() => SaveEntry(entry.Id)">Save</button>
+                            }
+                        </td>
+                        <td>
+                            <span @onclick="() => DeleteEntry(entry.Id)"><img src="Images/Delete.png" width="30px" /></span>
                         </td>
                     </tr>
                 }
             </table>
         }
     </article>
-
 </div>

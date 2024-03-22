@@ -9,6 +9,7 @@ public class DateEntryViewModel
     public DateTime? EndTime { get; set; }
     public string? Tags { get; set; }
     public string? Description { get; set; }
+    public TimeSpan? TotalTime { get; set; }
 
     public static DateEntryViewModel MapToDateEntry(DateEntry date)
     {
@@ -18,7 +19,8 @@ public class DateEntryViewModel
             StartTime = date.StartTime,
             EndTime = date.EndTime,
             Tags = date.Tags.Count > 0 ? string.Join(",", date.Tags) : string.Empty,
-            Description = date.Description
+            Description = date.Description,
+            TotalTime = date.EndTime.HasValue ? date.EndTime - date.StartTime : null
         };
     }
 }
