@@ -24,4 +24,8 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Images\LansweeperLogo-cropped.png" />
+  </ItemGroup>
+
 </Project>
