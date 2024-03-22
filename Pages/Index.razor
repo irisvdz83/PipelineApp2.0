@@ -45,6 +45,26 @@
             <span @onclick="@ToggleTimer"><img src="Images/Start.png" width="100px" /></span>
         }
         <span><b>@(ElapsedTimeCurrentTimeBlock)</b></span>
+        <span>@CurrentDescription</span>
+        @if (PipelineTimer is null || !IsRunning)
+        {
+            <div>
+                <input type="text" @bind="Task" style="width: 75%; border-radius: 16px; margin-left: 5px;" placeholder="Task" />
+            </div>
+            <div style="display: flex; flex-direction: column; margin-top: 20px;" >
+                @foreach (var tag in Tags)
+                {
+                    @if (tag.Selected)
+                    {
+                        <div class="tag" style="background-color: @tag.Colour; border-color: Highlight; cursor: pointer;" @onclick="() => TagClick(tag.Id)"><span>@tag.Name</span></div>
+                    }
+                    else
+                    {
+                        <div class="tag" style="background-color: @tag.Colour; cursor: pointer;" @onclick="() => TagClick(tag.Id)"><span>@tag.Name</span></div>
+                    }
+                }
+            </div>
+        }
     </article>
     <article style="width: 75%;">
 

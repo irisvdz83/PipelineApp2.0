@@ -38,6 +38,7 @@ input[type="checkbox"] {
     border-radius: 16px;
     padding: 8px;
     width: 75%;
+    border: solid 3px transparent;
 }
 
 .creationLink {
