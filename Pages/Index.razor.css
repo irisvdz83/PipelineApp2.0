@@ -1,0 +1,15 @@
+﻿#hoursDiv {
+    width: 100%;
+    background-color: white;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: 15px;
+    padding: 10px;
+    height: 100px
+}
+
+#userPicIcon {
+    width: 75px; 
+    height: 75px
+}
+
