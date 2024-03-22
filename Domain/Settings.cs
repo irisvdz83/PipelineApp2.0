@@ -3,9 +3,8 @@
 public class Setting
 {
     public Guid Id { get; set; }
-    public List<int> WorkingDaysPerWeek { get; set; } = new();
-    public int WorkingHoursPerDay { get; set; }
-    //should be set to ignored in the db
-    public int TotalHoursPerWeek => WorkingDaysPerWeek.Count * WorkingHoursPerDay;
-
+    public List<WeekDay> WeekDays { get; set; } = new();
+    public int LunchBreakInMinutes { get; set; } = 0;
+    public bool AddLunchBreaks { get; set; }
+    public List<Tag> Tags { get; set; } = new();
 }

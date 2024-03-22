@@ -9,6 +9,8 @@ public class PipelineDbContext : DbContext
     protected readonly IConfiguration Configuration;
     public DbSet<DateEntry> DateEntries { get; set; } = null!;
     public DbSet<Setting> Settings { get; set; } = null!;
+    public DbSet<WeekDay> WeekDays { get; set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
     public PipelineDbContext(IConfiguration configuration)
     {
         Configuration = configuration;
@@ -24,13 +26,6 @@ public class PipelineDbContext : DbContext
         modelBuilder.Entity<DateEntry>()
             .Property(nameof(DateEntry.Tags))
             .HasConversion(splitStringConverter);
-
-        var intArrayValueConverter = new ValueConverter<List<int>, string>(
-            i => string.Join(",", i),
-            s => string.IsNullOrWhiteSpace(s) ? new List<int>() : s.Split(new[] { ',' }).Select(int.Parse).ToList());
-        modelBuilder.Entity<Setting>()
-            .Property(nameof(Setting.WorkingDaysPerWeek))
-            .HasConversion(intArrayValueConverter);
     }
 
 }
