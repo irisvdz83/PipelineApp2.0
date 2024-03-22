@@ -6,26 +6,33 @@
 
 <PageTitle>Tracker</PageTitle>
 <div id="hoursDiv">
-    <div id="userDetails">
-        <img alt="userPicIcon" width="15" height="15" src="/images/Valentine-drawing-Sweepy.png" />
-        <h5>Welcome @UserName </h5>
-    </div>
-    <div id="hoursDetails">
-        <h5>Hours: </h5>
-        @switch (QuarterlyHours)
-        {
-            case >= 0 and <= 10:
-                <span style="color:green;">@QuarterlyHoursOverview</span>
-                break;
-            case > 10:
-                <span style="color:orange;">@QuarterlyHoursOverview</span>
-                break;
-            case < 0:
-                <span style="color:red;">@QuarterlyHoursOverview</span>
-                break;
-        }
-
-    </div>
+    <table style="width: 100%">
+        <tr>
+            <td style="width: 10%; vertical-align: middle; height=75px;">
+                <img alt="userPicIcon" id="userPicIcon" src="/images/Valentine-drawing-Sweepy.png" />
+            </td>
+            <td style="width: 70%; vertical-align: middle;height=75px;">
+                <h5>Welcome @UserName </h5>
+            </td>
+            <td style="width: 10%; vertical-align: middle; height=75px; text-align: right">
+                <h5>Hours: </h5>
+            </td>
+            <td style="width: 10%; vertical-align: middle;height=75px; text-align: left">
+                @switch (QuarterlyHours)
+                {
+                    case >= 0 and <= 10:
+                        <h5 style="color:green;">@QuarterlyHoursOverview</h5>
+                        break;
+                    case > 10:
+                        <h5 style="color:orange;">@QuarterlyHoursOverview</h5>
+                        break;
+                    case < 0:
+                        <h5 style="color:red;">@QuarterlyHoursOverview</h5>
+                        break;
+                }
+            </td>
+        </tr>
+    </table>
 </div>
 <div style="display: flex; flex-direction: row;">
     <article style="width: 25%;">

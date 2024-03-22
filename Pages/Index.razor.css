@@ -5,13 +5,11 @@
     -webkit-border-radius: inherit;
     border-radius: 15px;
     padding: 10px;
+    height: 100px
 }
 
-#hoursDetails {
-  float:right;
-}
-
-#userDetails {
-    float: left;
+#userPicIcon {
+    width: 75px; 
+    height: 75px
 }
 
