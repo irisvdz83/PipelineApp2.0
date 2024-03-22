@@ -1,4 +1,4 @@
-﻿using PipelineApp2._0.Domain;
+using PipelineApp2._0.Domain;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.Persistence;
 using System;
@@ -36,14 +36,14 @@ public class DateEntryController : IDateEntryController
             return new DateEntry();
         }
     }
-    public DateEntry? AddNewStartTime(Guid dateId, DateTime startTime)
+    public DateEntry? AddNewStartTime(Guid dateId, DateTime startTime, string task, List<string> tags)
     {
         try
         {
             var savedTodayEntry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == dateId);
             if (savedTodayEntry?.EndTime is not null)
             {
-                var newTodayEntry = new DateEntry { StartTime = startTime };
+                var newTodayEntry = new DateEntry { StartTime = startTime, Description = task, Tags = tags};
                 var savedEntity = _dbContext.Add(newTodayEntry);
                 _dbContext.SaveChanges();
                 _logger.LogDebug("Adding today entry successful.");
@@ -54,6 +54,8 @@ public class DateEntryController : IDateEntryController
             if(savedTodayEntry is not null)
             {
                 savedTodayEntry.StartTime = startTime;
+                savedTodayEntry.Description = task;
+                savedTodayEntry.Tags = tags;
                 _dbContext.Update(savedTodayEntry);
                 _dbContext.SaveChanges();
                 _logger.LogDebug("Updating today entry successful.");
@@ -153,4 +155,6 @@ public class DateEntryController : IDateEntryController
 
         return result;
     }
+
+    public List<Tag> GetAllTags() => _dbContext.Tags.ToList();
 }

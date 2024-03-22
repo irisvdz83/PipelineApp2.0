@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Components;
 using PipelineApp2._0.Controllers;
 using PipelineApp2._0.Domain;
@@ -38,18 +39,29 @@ public partial class Index : ComponentBase
     public List<DateEntryViewModel> TodaysEntries { get; set; } = new();
     private bool IsRunning { get; set; }
     private Timer? PipelineTimer { get; set; }
-    private long Seconds { get; set; }
-    private long TotalTimeSeconds { get; set; }
+    private double Seconds { get; set; }
+    private double TotalTimeSeconds { get; set; }
     private string QuarterlyHoursOverview { get; set; } = null!;
     private int QuarterlyHours { get; set; }
     private string UserName { get; set; } = null!;
     Dictionary<WeekDay, string> PreviousDaysWorkHours { get; set; } = new();
     private int Today { get; set; }
+    public string CurrentDescription { get; set; }
+
+    public string Task { get; set; }
+    public List<Tag> Tags { get; set; }
 
     protected override void OnInitialized()
     {
         var today = DateEntryController.GetToday();
         CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(today);
+        if (today.StartTime != null && today.EndTime == null)
+        {
+            IsRunning = true;
+            CurrentDescription = MakeDescription(today);
+            Seconds = (DateTime.Now - today.StartTime).TotalSeconds;
+            StartTimer(today.StartTime);
+        }
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
         var quarterly = QuarterlyHoursController.GetQuarterlyHourCount();
         QuarterlyHours = Convert.ToInt32(quarterly.Hours);
@@ -58,6 +70,7 @@ public partial class Index : ComponentBase
         PreviousDaysWorkHours = DateEntryController.GetThisWeekPreviousDaysWorkHoursAsString();
         Today = (int)DateTime.Today.Date.DayOfWeek;
         GetTotalElapsedTime();
+        Tags = DateEntryController.GetAllTags();
         base.OnInitialized();
     }
 
@@ -81,40 +94,57 @@ public partial class Index : ComponentBase
             ElapsedTimeSpanCurrentTimeBlock = new TimeSpan(0, 0, 0);
             CurrentDateEntryViewModel.StartTime = DateTime.Now;
             var updatedDateEntry =
-                DateEntryController.AddNewStartTime(CurrentDateEntryViewModel.Id, CurrentDateEntryViewModel.StartTime);
+                DateEntryController.AddNewStartTime(CurrentDateEntryViewModel.Id, CurrentDateEntryViewModel.StartTime, Task, Tags.Where(x => x.Selected).Select(x => x.Name).ToList());
             if (updatedDateEntry != null)
-                CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(updatedDateEntry);
-            TotalTimeSeconds = (long)DateEntryController.GetTotalWorkedTimeToday().TotalSeconds;
-
-            PipelineTimer = new Timer(_ =>
             {
-                Seconds += 1;
-                TotalTimeSeconds += 1;
-                ElapsedTimeSpanCurrentTimeBlock = TimeSpan.FromSeconds(Seconds);
-                ElapsedTotalTimeSpan = TimeSpan.FromSeconds(TotalTimeSeconds);
-                var hours = ElapsedTimeSpanCurrentTimeBlock.Hours < 10
-                    ? $"0{ElapsedTimeSpanCurrentTimeBlock.Hours}"
-                    : $"{ElapsedTimeSpanCurrentTimeBlock.Hours}";
-                var minutes = ElapsedTimeSpanCurrentTimeBlock.Minutes < 10
-                    ? $"0{ElapsedTimeSpanCurrentTimeBlock.Minutes}"
-                    : $"{ElapsedTimeSpanCurrentTimeBlock.Minutes}";
-                var seconds = ElapsedTimeSpanCurrentTimeBlock.Seconds < 10
-                    ? $"0{ElapsedTimeSpanCurrentTimeBlock.Seconds}"
-                    : $"{ElapsedTimeSpanCurrentTimeBlock.Seconds}";
-                _elapsedTimeCurrentTimeBlock = $"{hours}:{minutes}:{seconds}";
-                var totalHours = ElapsedTotalTimeSpan.Hours < 10
-                    ? $"0{ElapsedTotalTimeSpan.Hours}"
-                    : $"{ElapsedTotalTimeSpan.Hours}";
-                var totalMinutes = ElapsedTotalTimeSpan.Minutes < 10
-                    ? $"0{ElapsedTotalTimeSpan.Minutes}"
-                    : $"{ElapsedTotalTimeSpan.Minutes}";
-                var totalSeconds = ElapsedTotalTimeSpan.Seconds < 10
-                    ? $"0{ElapsedTotalTimeSpan.Seconds}"
-                    : $"{ElapsedTotalTimeSpan.Seconds}";
-                _elapsedTotalTime = $"{totalHours}:{totalMinutes}:{totalSeconds}";
-                InvokeAsync(StateHasChanged);
-            }, null, 0, 1000);
+                CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(updatedDateEntry);
+                CurrentDescription = MakeDescription(updatedDateEntry);
+            }
+            TotalTimeSeconds = (long)DateEntryController.GetTotalWorkedTimeToday().TotalSeconds;
+            StartTimer();
         }
+    }
+
+    private string MakeDescription(DateEntry dataEntry)
+    {
+        var builder = new StringBuilder(dataEntry.Description);
+        if (dataEntry.Tags.Any())
+        {
+            builder.Append($" ({string.Join(", ", dataEntry.Tags)})");
+        }
+        return builder.ToString();
+    }
+
+    private void StartTimer(DateTime? start = null)
+    {
+        PipelineTimer = new Timer(_ =>
+        {
+            Seconds += 1;
+            TotalTimeSeconds += 1;
+            ElapsedTimeSpanCurrentTimeBlock = TimeSpan.FromSeconds(Seconds);
+            ElapsedTotalTimeSpan = TimeSpan.FromSeconds(TotalTimeSeconds);
+            var hours = ElapsedTimeSpanCurrentTimeBlock.Hours < 10
+                ? $"0{ElapsedTimeSpanCurrentTimeBlock.Hours}"
+                : $"{ElapsedTimeSpanCurrentTimeBlock.Hours}";
+            var minutes = ElapsedTimeSpanCurrentTimeBlock.Minutes < 10
+                ? $"0{ElapsedTimeSpanCurrentTimeBlock.Minutes}"
+                : $"{ElapsedTimeSpanCurrentTimeBlock.Minutes}";
+            var seconds = ElapsedTimeSpanCurrentTimeBlock.Seconds < 10
+                ? $"0{ElapsedTimeSpanCurrentTimeBlock.Seconds}"
+                : $"{ElapsedTimeSpanCurrentTimeBlock.Seconds}";
+            _elapsedTimeCurrentTimeBlock = $"{hours}:{minutes}:{seconds}";
+            var totalHours = ElapsedTotalTimeSpan.Hours < 10
+                ? $"0{ElapsedTotalTimeSpan.Hours}"
+                : $"{ElapsedTotalTimeSpan.Hours}";
+            var totalMinutes = ElapsedTotalTimeSpan.Minutes < 10
+                ? $"0{ElapsedTotalTimeSpan.Minutes}"
+                : $"{ElapsedTotalTimeSpan.Minutes}";
+            var totalSeconds = ElapsedTotalTimeSpan.Seconds < 10
+                ? $"0{ElapsedTotalTimeSpan.Seconds}"
+                : $"{ElapsedTotalTimeSpan.Seconds}";
+            _elapsedTotalTime = $"{totalHours}:{totalMinutes}:{totalSeconds}";
+            InvokeAsync(StateHasChanged);
+        }, start, 0, 1000);
     }
 
     private void StopTimer()
@@ -130,5 +160,15 @@ public partial class Index : ComponentBase
         Seconds = 0;
         TotalTimeSeconds = 0;
         _elapsedTimeCurrentTimeBlock = "00:00:00";
+        CurrentDescription = string.Empty;
+    }
+
+    public void TagClick(Guid id)
+    {
+        var match = Tags.FirstOrDefault(x => x.Id == id);
+        if (match != null)
+        {
+            match.Selected = !match.Selected;
+        }
     }
 }
