@@ -160,6 +160,8 @@ public partial class Index : ComponentBase
         TotalTimeSeconds = 0;
         _elapsedTimeCurrentTimeBlock = "00:00:00";
         CurrentDescription = string.Empty;
+        Task = string.Empty;
+        Tags.ForEach(x => x.Selected = false);
     }
 
     public void TagClick(Guid id)
@@ -200,5 +202,6 @@ public partial class Index : ComponentBase
         DateEntryController.UpdateDateEntry(id, dateEntry);
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
         GetTotalElapsedTime();
+        Tags.ForEach(x => x.Selected = false);
     }
 }

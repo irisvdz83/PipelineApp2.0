@@ -18,7 +18,7 @@ public class DateEntryViewModel
             Id = date.Id,
             StartTime = date.StartTime,
             EndTime = date.EndTime,
-            Tags = date.Tags.Count > 0 ? string.Join(",", date.Tags) : string.Empty,
+            Tags = date.Tags.Count > 0 ? string.Join(", ", date.Tags) : string.Empty,
             Description = date.Description,
             TotalTime = date.EndTime.HasValue ? date.EndTime - date.StartTime : null
         };

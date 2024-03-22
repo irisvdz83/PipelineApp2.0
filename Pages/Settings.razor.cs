@@ -14,6 +14,9 @@ public partial class Settings : ComponentBase
     public List<WeekDay> TempWeekDays;
     public bool TempAddLunchBreaks;
     public int TempLunchBreakInMinutes;
+    public string NewTag { get; set; }
+    public string NewTagColour;
+
 
     protected override void OnInitialized()
     {
@@ -22,6 +25,7 @@ public partial class Settings : ComponentBase
 
     private void GetSetting()
     {
+        NewTagColour = "#EFAD84";
         var settings = SettingsController.GetOrAddSettings();
         SettingViewModel = SettingViewModel.MapToDateEntry(settings);
         TempWeekDays = new();
@@ -52,11 +56,11 @@ public partial class Settings : ComponentBase
         {
             SettingViewModel.WeekDays.Add((WeekDay)item.Clone());
         });
-        SettingsController.SaveSettings(TempWeekDays);
+        SettingsController.UpdateWeekdays(TempWeekDays);
 
         SettingViewModel.AddLunchBreaks = TempAddLunchBreaks;
         SettingViewModel.LunchBreakInMinutes = TempLunchBreakInMinutes;
-        SettingsController.SaveSettings(SettingViewModel);
+        SettingsController.UpdateWeekdays(SettingViewModel.WeekDays);
 
         SetTotals();
         Editing = false;
@@ -76,6 +80,20 @@ public partial class Settings : ComponentBase
 
     public void TagDelete(Guid id)
     {
-        throw new NotImplementedException();
+        SettingsController.DeleteTag(id);
     }
+
+    private void CreateNewTag()
+    {
+        var newTag = new Tag
+        {
+            Name = NewTag,
+            Colour = NewTagColour,
+            SettingId = SettingViewModel.Id
+        };
+        SettingsController.AddNewTag(newTag);
+        GetSetting();
+        NewTag = string.Empty;
+    }
+
 }

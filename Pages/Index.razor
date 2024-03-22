@@ -44,7 +44,7 @@
         {
             <span @onclick="@ToggleTimer"><img src="Images/Start.png" width="100px" /></span>
         }
-        <span><b>@(ElapsedTimeCurrentTimeBlock)</b></span>
+        <span><b>@(ElapsedTimeCurrentTimeBlock)</b></span><br/>
         <span>@CurrentDescription</span>
         @if (PipelineTimer is null || !IsRunning)
         {

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PipelineApp2._0.Domain;
+﻿using PipelineApp2._0.Domain;
 using PipelineApp2._0.Persistence;
 using PipelineApp2._0.ViewModels;
 
@@ -95,7 +94,7 @@ public class SettingsController : ISettingsController
         }
     }
 
-    public void SaveSettings(List<WeekDay> weekDays)
+    public void UpdateWeekdays(List<WeekDay> weekDays)
     {
         var existingWeekDays = _dbContext.WeekDays.ToList();
         weekDays.ForEach(item =>
@@ -106,6 +105,20 @@ public class SettingsController : ISettingsController
             existing.Minutes = item.Minutes;
         });
         _dbContext.UpdateRange(existingWeekDays);
+        _dbContext.SaveChanges();
+    }
+
+    public void AddNewTag(Tag newTag)
+    {
+        _dbContext.Tags.Add(newTag);
+        _dbContext.SaveChanges();
+    }
+
+    public void DeleteTag(Guid tagId)
+    {
+        var savedTag =_dbContext.Tags.FirstOrDefault(x => x.Id == tagId);
+        if (savedTag is null) return;
+        _dbContext.Tags.Remove(savedTag);
         _dbContext.SaveChanges();
     }
 

@@ -6,9 +6,9 @@ namespace PipelineApp2._0.Controllers;
 public interface ISettingsController
 {
     Setting GetOrAddSettings();
-    void SaveSettings(List<WeekDay> weekDays);
+    void UpdateWeekdays(List<WeekDay> weekDays);
+    void AddNewTag(Tag newTag);
     void SaveSettings(SettingViewModel settings);
-    /*Task ToggleDay(DayOfWeek dayOfWeek);
-    Task SetWorkingHoursPerDay(int workingHoursPerDay);
-    void SaveSettings(Setting setting);*/
+    void DeleteTag(Guid tagId);
+
 }
