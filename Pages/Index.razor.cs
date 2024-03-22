@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.ViewModels;
 
@@ -96,5 +96,9 @@ public partial class Index : ComponentBase
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
         Seconds = 0;
         _elapsedTimeCurrentTimeBlock = "00:00:00";
+    }
+
+    public void DescriptionChange()
+    {
     }
 }

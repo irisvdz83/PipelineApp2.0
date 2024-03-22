@@ -1,40 +1,77 @@
 ﻿@page "/"
 @using PipelineApp2._0.Controllers
 @inject IDateEntryController DateEntryController
+<link href="css/Settings.css" rel="stylesheet" />
 
-<PageTitle>Today</PageTitle>
+<PageTitle>Tracker</PageTitle>
 
-@if (PipelineTimer is not null && IsRunning)
-{
-    <span @onclick="@ToggleTimer"><i class="oi oi-media-pause"></i></span>
-    <span @onclick="@StopTimer"><i class="oi oi-media-stop"></i></span>
-}
-else
-{
-    <span @onclick="@ToggleTimer"><i class="oi oi-play-circle"></i></span>
-}
-<span> Time worked current time block: @(ElapsedTimeCurrentTimeBlock)</span>
-<br/>
-<br/>
-<span> Total time worked today: @(ElapsedTotalTime)</span>
-<hr/>
-@if (TodaysEntries.Any())
-{
-    
-    <h1>Today @TodaysEntries.FirstOrDefault()!.StartTime.ToShortDateString()</h1>
-    <table>
-        @foreach (var entry in TodaysEntries)
+<div style="display: flex; flex-direction: row;">
+    <article style="width: 25%;">
+        @if (PipelineTimer is not null && IsRunning)
         {
-            <tr>
-                <td>@entry.StartTime</td>
-                <td>@entry.EndTime</td>
-            </tr>
-            <tr>
-                <td>@entry.Description</td>
-            </tr>
-            <tr>
-                <td>@entry.Tags</td>
-            </tr>
+            <span @onclick="@StopTimer"><i class="oi oi-media-stop"></i></span>
         }
-    </table>
-}
+        else
+        {
+            <span @onclick="@ToggleTimer"><i class="oi oi-play-circle"></i></span>
+        }
+        <span> Time worked current time block: @(ElapsedTimeCurrentTimeBlock)</span>
+        <br />
+        <br />
+        <span> Total time worked today: @(ElapsedTotalTime)</span>
+        <hr />
+    </article>
+    <article style="width: 75%;">
+
+        @if (TodaysEntries.Any())
+        {
+            <h1>@TodaysEntries.FirstOrDefault()!.StartTime.DayOfWeek @TodaysEntries.FirstOrDefault()!.StartTime.ToShortDateString()</h1>
+            <div style="display: flex; flex-direction: row;">
+                <article style="width: 10%; " class="greyBlock">
+                    <b>M</b>
+                    00:00:00
+                </article>
+                <article style="width: 10%;" class="greyBlock">
+                    <b>T</b>
+                    00:00:00
+                </article>
+                <article style="width: 10%; position: relative;" class="greyBlock">
+                    <b>W</b>
+                    00:00:00
+                </article>
+                <article style="width: 10%; position: relative;" class="greyBlock">
+                    <b>Th</b>
+                    @(ElapsedTotalTime)
+                </article>
+                <article style="width: 10%; position: relative;" class="greyBlock">
+                    <b>F</b>
+                    00:00:00
+                </article>
+                <article style="width: 10%; position: relative;" class="greyBlock">
+                    <b>Sa</b>
+                    00:00:00
+                </article>
+                <article style="width: 10%; position: relative;" class="greyBlock">
+                    <b>Su</b>
+                    00:00:00
+                </article>
+            </div>
+            <table>
+                @foreach (var entry in TodaysEntries)
+                {
+                    <tr>
+                        <td width="70%"><b>@entry.Description</b><br /><i>@entry.Tags</i></td>
+                        <td>@entry.StartTime.ToString("HH:mm") - @entry.EndTime.Value.ToString("HH:mm")</td>
+                        <td><img src="Images/Edit.png" style="width:30px" /> </td>
+                        <td><img src="Images/Delete.png" style="width:30px" /></td>
+                   @*      <td> <input type="text" @bind="@entry.Description" @bind:after="DescriptionChange" /> </td> *@
+                        
+                        
+                        @* <input type="checkbox" @bind="SettingViewModel.AddLunchBreaks" @bind:after="LunchBreakChange" /> *@
+                    </tr>
+                }
+            </table>
+        }
+    </article>
+
+</div>
