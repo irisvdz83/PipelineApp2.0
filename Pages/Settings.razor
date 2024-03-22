@@ -1,5 +1,6 @@
 ﻿@page "/settings"
 @using PipelineApp2._0.Controllers
+@using System.ComponentModel
 @inject ISettingsController SettingsController
 <link href="css/Settings.css" rel="stylesheet" />
 <PageTitle>Settings</PageTitle>
@@ -11,59 +12,110 @@
         <img alt="userPic" width="100" height="100" src="/images/Valentine-drawing-Sweepy.png" />
         <a href="#" style="position: absolute; bottom: 25px; right: 25px;"><img alt="editPicture" width="32" height="32" /></a>
     </article>
-    <article style="width: 50%;" class="greyBlock">
-        <form method="post">
-            @Output
-            <h4>Working schedule</h4>
-            <div>
-                <table cellspacing="3" cellpadding="3">
-                    <tr>
-                        <td>&nbsp;</td>
-                        @foreach (var weekDay in SettingViewModel.WeekDays)
-                        {
-                            <td>
-                                <center>
-                                    <b>@weekDay.Name.Substring(0, 3)</b>
-                                </center>
-                            </td>
-                        }
-                        <td><b>Total</b></td>
-                    </tr>
-                    <tr>
-                        <td>Working days</td>
-                        @foreach (var weekDay in SettingViewModel.WeekDays)
-                        {
-                            <td>
-                                <center>
-                                    <input type="checkbox" @bind="weekDay.IsWorkDay" @bind:after="() => WeekDayChange(weekDay.Id)" />
-                                </center>
-                            </td>
-                        }
-                        <td>&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td>Working hours</td>
-                        @foreach (var weekDay in SettingViewModel.WeekDays)
-                        {
-                            <td>
-                                <input type="number" @bind="weekDay.Hours" @bind:after="() => WeekDayChange(weekDay.Id)" />h
-                                <input type="number" @bind="weekDay.Minutes" @bind:after="() => WeekDayChange(weekDay.Id)" />m
-                            </td>
-                        }
-                        <td><b>@(TotalHours)h @(TotalMinutes)m</b></td>
-                    </tr>
-                </table>
+    <article style="width: 75%;" class="greyBlock">
+        <form method="post" style="display: flex; flex-direction: row;">
+            <div style="width: 930px;">
+                @Output
+                <h4>Working schedule</h4>
+                <div>
+                    <table cellspacing="3" cellpadding="3">
+                        <tr>
+                            <td>&nbsp;</td>
+                            @foreach (var weekDay in SettingViewModel.WeekDays)
+                            {
+                                <td>
+                                    <center>
+                                        <b style="margin: 0px 16px;">@weekDay.Name.Substring(0, 3)</b>
+                                    </center>
+                                </td>
+                            }
+                            <td><b>Total</b></td>
+                        </tr>
+                        <tr>
+                            <td><span style="margin-right: 10px; display: block; min-width: 116px;">Working days</span></td>
+                            @if (!Editing)
+                            {
+                                @foreach (var weekDay in SettingViewModel.WeekDays)
+                                {
+                                    <td>
+                                        <center>
+                                                <img src="/images/@(weekDay.IsWorkDay ? "check-circle.png" : "cross-circle.png")" width="20px" height="20px" />
+                                        </center>
+                                    </td>
+                                }
+                            }
+                            else
+                            {
+                                @foreach (var weekDay in TempWeekDays)
+                                {
+                                    <td>
+                                        <center>
+                                            <input type="checkbox" @bind="weekDay.IsWorkDay" />
+                                        </center>
+                                    </td>
+                                }
+                            }
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td><span style="margin-right: 10px; display: block; min-width: 116px;">Working hours</span></td>
+                            @if (!Editing)
+                            {
+                                @foreach (var weekDay in SettingViewModel.WeekDays)
+                                {
+                                    <td>
+                                        <center>
+                                            @(weekDay.Hours)@("h") @(weekDay.Minutes == 0 ? "" : $"{weekDay.Minutes}m")
+                                        </center>
+                                    </td>
+                                }
+                            }
+                            else
+                            {
+                                @foreach (var weekDay in TempWeekDays)
+                                {
+                                    <td>
+                                        @if (weekDay.IsWorkDay)
+                                        {
+                                            <input type="number" @bind="weekDay.Hours"/>@("h")
+                                            <input type="number" @bind="weekDay.Minutes"/>@("m")
+                                        }
+                                    </td>
+                                }
+                            }
+                            
+                            <td><b>@(TotalHours)h @(TotalMinutes == 0 ? "" : $"{TotalMinutes}m")</b></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div style="margin-left: 16px;">
+                <h4>Lunch breaks</h4>
+                <div>
+                    @if (!Editing)
+                    {
+                        @(SettingViewModel.AddLunchBreaks ? $"Adding lunch breaks of {SettingViewModel.LunchBreakInMinutes} minutes" : "Not adding lunch breaks")
+                    }
+                    else
+                    {
+                        <label><input type="checkbox" @bind="TempAddLunchBreaks" /> Add lunch breaks</label>
+                        <br />
+                        <input type="number" @bind="TempLunchBreakInMinutes" /> @("minutes")
+                    }
+                </div>
             </div>
         </form>
-    </article>
-    <article style="width: 25%" class="greyBlock">
-        <form method="post">
-            <h4>Lunch breaks</h4>
-            <div>
-                <input type="checkbox" @bind="SettingViewModel.AddLunchBreaks" @bind:after="LunchBreakChange" />
-                <input type="number" @bind="SettingViewModel.LunchBreakInMinutes" @bind:after="LunchBreakChange" /> minutes
-            </div>
-        </form>
+        <div style="position: absolute; bottom: 20px; left: 20px;">
+            @if (!Editing)
+            {
+                <button @onclick="EditWeekDays">Edit</button>
+            }
+            else
+            {
+                <button @onclick="SaveWeekDays">Save</button>
+                <button @onclick="CancelWeekDays">Cancel</button>
+            }
+        </div>
     </article>
 </div>
 <div style="display: flex; flex-direction: row;">
