@@ -94,5 +94,7 @@ public partial class Index : ComponentBase
         DateEntryController.UpdateEndTime(CurrentDateEntryViewModel.Id, CurrentDateEntryViewModel.EndTime.Value);
         ElapsedTotalTimeSpan = DateEntryController.GetTotalWorkedTimeToday();
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
+        Seconds = 0;
+        _elapsedTimeCurrentTimeBlock = "00:00:00";
     }
 }
