@@ -1,10 +1,32 @@
 ﻿@page "/"
 @using PipelineApp2._0.Controllers
 @inject IDateEntryController DateEntryController
+@inject IQuarterlyHoursController QuarterlyHoursController
 <link href="css/Settings.css" rel="stylesheet" />
 
 <PageTitle>Tracker</PageTitle>
+<div id="hoursDiv">
+    <div id="userDetails">
+        <img alt="userPicIcon" width="15" height="15" src="/images/Valentine-drawing-Sweepy.png" />
+        <h5>Welcome @UserName </h5>
+    </div>
+    <div id="hoursDetails">
+        <h5>Hours: </h5>
+        @switch (QuarterlyHours)
+        {
+            case > 0 and < 10:
+                <span style="color:green;">@QuarterlyHoursOverview</span>
+                break;
+            case > 10:
+                <span style="color:orange;">@QuarterlyHoursOverview</span>
+                break;
+            case < 0:
+                <span style="color:red;">@QuarterlyHoursOverview</span>
+                break;
+        }
 
+    </div>
+</div>
 <div style="display: flex; flex-direction: row;">
     <article style="width: 25%;">
         @if (PipelineTimer is not null && IsRunning)

@@ -9,8 +9,12 @@ public class QuarterlyHourCount : IDbEntity
 
     public override string ToString()
     {
-        var hourString = Hours.ToString(CultureInfo.InvariantCulture);
+        var hourString = $"{Hours:f2}";
         var decimalParts = hourString.Split(',');
-        return $"{decimalParts[0]}:{decimalParts[1]}:00";
+
+        var hours =int.Parse(decimalParts[0]) < 10 ? $"0{decimalParts[0]}" : $"{decimalParts[0]}";
+        var minutes = int.Parse(decimalParts[1]) < 10 ? $"0{decimalParts[1]}" : $"{decimalParts[1]}";
+        
+        return $"{hours}:{minutes}";
     }
 }

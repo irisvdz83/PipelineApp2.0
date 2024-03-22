@@ -12,6 +12,7 @@ builder.Services.AddDbContextFactory<PipelineDbContext>(options => options.UseSq
 
 builder.Services.AddTransient<IDateEntryController, DateEntryController>();
 builder.Services.AddTransient<ISettingsController, SettingsController>();
+builder.Services.AddTransient<IQuarterlyHoursController, QuarterlyHoursController>();
 builder.Services.AddHostedService<PipelineService>();
 
 var app = builder.Build();

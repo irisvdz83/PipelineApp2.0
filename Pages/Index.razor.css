@@ -1,0 +1,17 @@
+﻿#hoursDiv {
+    width: 100%;
+    background-color: white;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+#hoursDetails {
+  float:right;
+}
+
+#userDetails {
+    float: left;
+}
+

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using PipelineApp2._0.Controllers;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.ViewModels;
 
@@ -34,12 +35,19 @@ public partial class Index : ComponentBase
     private Timer? PipelineTimer { get; set; }
     private long Seconds { get; set; }
     private long TotalTimeSeconds { get; set; }
+    private string QuarterlyHoursOverview { get; set; } = null!;
+    private int QuarterlyHours { get; set; }
+    private string UserName { get; set; } = null!;
     protected override void OnInitialized()
     {
         var today = DateEntryController.GetToday();
         CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(today);
         GetTotalElapsedTime();
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
+        var quarterly = QuarterlyHoursController.GetQuarterlyHourCount();
+        QuarterlyHours = Convert.ToInt32(quarterly.Hours);
+        QuarterlyHoursOverview = quarterly.ToString();
+        UserName = "Team Pipeline";
         base.OnInitialized();
     }
 
