@@ -74,25 +74,8 @@ public partial class Settings : ComponentBase
         Editing = false;
     }
 
-    /*private async Task ToggleDay(DayOfWeek dayOfWeek)
+    public void TagDelete(Guid id)
     {
-        await SettingsController.ToggleDay(dayOfWeek);
-        GetSetting();
+        throw new NotImplementedException();
     }
-
-    private async Task SetWorkingHoursPerDay(ChangeEventArgs ev)
-    {
-        SettingViewModel.WorkingHoursPerDay = WorkingHoursPerDay;
-        await SettingsController.SetWorkingHoursPerDay(SettingViewModel.WorkingHoursPerDay);
-        GetSetting();
-    }
-
-    private void SaveChanges()
-    {
-        SettingsController.SaveSettings(new Setting
-        {
-            WorkingHoursPerDay = SettingViewModel.WorkingHoursPerDay,
-            WeekDays = SettingViewModel.WeekDays
-        });
-    }*/
 }
