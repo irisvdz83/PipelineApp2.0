@@ -9,50 +9,46 @@
     <article style="width: 25%;">
         @if (PipelineTimer is not null && IsRunning)
         {
-            <span @onclick="@StopTimer"><i class="oi oi-media-stop"></i></span>
+            <span @onclick="@StopTimer"><img src="Images/Stop.png" width="100px" /></span>
         }
         else
         {
-            <span @onclick="@ToggleTimer"><i class="oi oi-play-circle"></i></span>
+            <span @onclick="@ToggleTimer"><img src="Images/Start.png" width="100px" /></span>
         }
-        <span> Time worked current time block: @(ElapsedTimeCurrentTimeBlock)</span>
-        <br />
-        <br />
-        <span> Total time worked today: @(ElapsedTotalTime)</span>
-        <hr />
+        <span><b>@(ElapsedTimeCurrentTimeBlock)</b></span>
     </article>
     <article style="width: 75%;">
 
         @if (TodaysEntries.Any())
         {
-            <h1>@TodaysEntries.FirstOrDefault()!.StartTime.DayOfWeek @TodaysEntries.FirstOrDefault()!.StartTime.ToShortDateString()</h1>
+            <h1><b>@TodaysEntries.FirstOrDefault()!.StartTime.DayOfWeek</b> @TodaysEntries.FirstOrDefault()!.StartTime.ToString("MMMM d, yyyy")</h1>
             <div style="display: flex; flex-direction: row;">
                 <article style="width: 10%; " class="greyBlock">
-                    <b>M</b>
+                    <b>M</b><br />
                     00:00:00
                 </article>
                 <article style="width: 10%;" class="greyBlock">
-                    <b>T</b>
+                    <b>T</b><br />
                     00:00:00
                 </article>
                 <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>W</b>
+                    <b>W</b><br />
                     00:00:00
                 </article>
                 <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>Th</b>
+                    <b>Th</b><br />
                     @(ElapsedTotalTime)
                 </article>
                 <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>F</b>
+                    <b>F</b><br />
                     00:00:00
                 </article>
                 <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>Sa</b>
+                    <b>Sa</b><br />
                     00:00:00
                 </article>
                 <article style="width: 10%; position: relative;" class="greyBlock">
-                    <b>Su</b>
+                    <b>Su</b><br />
                     00:00:00
                 </article>
             </div>
@@ -63,11 +59,9 @@
                         <td width="70%"><b>@entry.Description</b><br /><i>@entry.Tags</i></td>
                         <td>@entry.StartTime.ToString("HH:mm") - @entry.EndTime.Value.ToString("HH:mm")</td>
                         <td><img src="Images/Edit.png" style="width:30px" /> </td>
-                        <td><img src="Images/Delete.png" style="width:30px" /></td>
-                   @*      <td> <input type="text" @bind="@entry.Description" @bind:after="DescriptionChange" /> </td> *@
-                        
-                        
-                        @* <input type="checkbox" @bind="SettingViewModel.AddLunchBreaks" @bind:after="LunchBreakChange" /> *@
+                        <td>
+                            <span><img src="Images/Delete.png" width="30px" /></span>
+                        </td>
                     </tr>
                 }
             </table>
