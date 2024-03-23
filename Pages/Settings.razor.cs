@@ -87,7 +87,7 @@ public partial class Settings : ComponentBase
     {
         var newTag = new Tag
         {
-            Name = NewTag,
+            Name = string.IsNullOrEmpty(NewTag) ? "emptyTagName" : NewTag,
             Colour = NewTagColour,
             SettingId = SettingViewModel.Id
         };

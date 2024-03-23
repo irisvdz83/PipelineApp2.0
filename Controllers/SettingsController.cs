@@ -1,4 +1,5 @@
-﻿using PipelineApp2._0.Domain;
+﻿using PipelineApp2._0.Contants;
+using PipelineApp2._0.Domain;
 using PipelineApp2._0.Persistence;
 using PipelineApp2._0.ViewModels;
 
@@ -53,26 +54,30 @@ public class SettingsController : ISettingsController
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Break",
-                        Colour = "#FFDE59"
+                        Name = PipelineConstants.Break,
+                        Colour = "#FFDE59",
+                        IsDefault = true
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Development",
-                        Colour = "#FFD088"
+                        Name = PipelineConstants.Development,
+                        Colour = "#FFD088",
+                        IsDefault = true
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Learning",
-                        Colour = "#EFAD84"
+                        Name = PipelineConstants.Learning,
+                        Colour = "#EFAD84",
+                        IsDefault = true
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Name = "Meeting",
-                        Colour = "#92D1B3"
+                        Name = PipelineConstants.Meeting,
+                        Colour = "#92D1B3",
+                        IsDefault = true
                     }
                 };
 

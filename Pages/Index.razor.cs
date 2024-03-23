@@ -40,8 +40,7 @@ public partial class Index : ComponentBase
     private Timer? PipelineTimer { get; set; }
     private double Seconds { get; set; }
     private double TotalTimeSeconds { get; set; }
-    private string QuarterlyHoursOverview { get; set; } = null!;
-    private int QuarterlyHours { get; set; }
+    private TimeSpan QuarterlyHoursInTimeSpan { get; set; }
     private string UserName { get; set; } = null!;
     Dictionary<WeekDay, string> PreviousDaysWorkHours { get; set; } = new();
     private int Today { get; set; }
@@ -54,17 +53,16 @@ public partial class Index : ComponentBase
     {
         var today = DateEntryController.GetToday();
         CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(today);
-        if (today.StartTime != null && today.EndTime == null)
+        if (!today.StartTime.TimeOfDay.Equals(new TimeSpan(0,0,0)) && today.EndTime == null)
         {
             IsRunning = true;
             CurrentDescription = MakeDescription(today);
             Seconds = (DateTime.Now - today.StartTime).TotalSeconds;
             StartTimer(today.StartTime);
         }
+
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
-        var quarterly = QuarterlyHoursController.GetQuarterlyHourCount();
-        QuarterlyHours = Convert.ToInt32(quarterly.Hours);
-        QuarterlyHoursOverview = quarterly.ToString();
+        QuarterlyHoursInTimeSpan = QuarterlyHoursController.GetQuarterlyHourCount().Hours;
         UserName = "Team Pipeline";
         PreviousDaysWorkHours = DateEntryController.GetThisWeekPreviousDaysWorkHoursAsString();
         Today = (int)DateTime.Today.Date.DayOfWeek;

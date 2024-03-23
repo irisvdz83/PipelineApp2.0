@@ -7,6 +7,7 @@ namespace PipelineApp2._0.Domain
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string Colour { get; set; } = null!;
+        public bool IsDefault { get; set; }
         public Guid SettingId { get; set; }
         
         [NotMapped]

@@ -2,6 +2,8 @@ using PipelineApp2._0.Domain;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.Persistence;
 using System;
+using PipelineApp2._0.Contants;
+using PipelineApp2._0.Extensions;
 
 namespace PipelineApp2._0.Controllers;
 
@@ -43,7 +45,7 @@ public class DateEntryController : IDateEntryController
             var savedTodayEntry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == dateId);
             if (savedTodayEntry?.EndTime is not null)
             {
-                var newTodayEntry = new DateEntry { StartTime = startTime, Description = task, Tags = tags};
+                var newTodayEntry = new DateEntry { StartTime = startTime, Description = task, Tags = tags };
                 var savedEntity = _dbContext.Add(newTodayEntry);
                 _dbContext.SaveChanges();
                 _logger.LogDebug("Adding today entry successful.");
@@ -51,7 +53,7 @@ public class DateEntryController : IDateEntryController
                 return newTodayEntry;
             }
 
-            if(savedTodayEntry is not null)
+            if (savedTodayEntry is not null)
             {
                 savedTodayEntry.StartTime = startTime;
                 savedTodayEntry.Description = task;
@@ -59,7 +61,7 @@ public class DateEntryController : IDateEntryController
                 _dbContext.Update(savedTodayEntry);
                 _dbContext.SaveChanges();
                 _logger.LogDebug("Updating today entry successful.");
-               return savedTodayEntry;
+                return savedTodayEntry;
             }
         }
         catch (Exception ex)
@@ -93,11 +95,20 @@ public class DateEntryController : IDateEntryController
 
     public TimeSpan GetTotalWorkedTimeToday()
     {
+        var settings = _dbContext.Settings.FirstOrDefault();
         var today = _dbContext.DateEntries.Where(x => x.StartTime.Date.Equals(DateTime.Today.Date) && x.EndTime.HasValue).OrderByDescending(x => x.StartTime);
+        var dayOfWeek = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek == (int)DateTime.Today.Date.DayOfWeek);
+
         TimeSpan totalWorkedTime = default;
         foreach (var todayEntry in today)
         {
+            if (todayEntry.StartTime is { Hour: 0, Minute: 0, Second: 0 } && todayEntry.EndTime is { Hour: 23, Minute: 59, Second: 59 } && !dayOfWeek!.IsWorkDay) continue;
+            if (todayEntry.Tags.CaseInsensitiveContains(PipelineConstants.Break)) continue;
             totalWorkedTime += todayEntry.EndTime!.Value - todayEntry.StartTime;
+        }
+        if (settings is not null && settings.AddLunchBreaks && dayOfWeek!.IsWorkDay && !today.Contains(x => x.Tags.Exists(t => t.CaseInsensitiveContains(PipelineConstants.Break) || t.CaseInsensitiveContains(PipelineConstants.DayOff))))
+        {
+            totalWorkedTime -= TimeSpan.FromMinutes(settings.LunchBreakInMinutes);
         }
         return totalWorkedTime;
     }
@@ -110,54 +121,78 @@ public class DateEntryController : IDateEntryController
 
     public Dictionary<WeekDay, string> GetThisWeekPreviousDaysWorkHoursAsString()
     {
-        var result = new Dictionary<WeekDay, string>();
-        var currentDay = DateTime.Now.DayOfWeek;
-        var daysTillCurrentDay = currentDay - DayOfWeek.Monday;
-        var workingDays = _dbContext.WeekDays;
-        var previousDays = _dbContext.DateEntries
-            .Where(x => x.StartTime.Date >= DateTime.Today.Date.AddDays(-daysTillCurrentDay) &&
-                        x.StartTime.Date < DateTime.Today.Date).OrderByDescending(x => x.StartTime)
-            .GroupBy(x => x.StartTime.Date);
-        foreach (var day in previousDays)
+        try
         {
-            var dayOfWeek = workingDays.FirstOrDefault(x => x.DayOfWeek == (int)day.Key.DayOfWeek);
-            if (dayOfWeek is null) continue;
-            var dayTimeBlocks = day.ToList();
-            TimeSpan timeWorked = default;
-            foreach (var timeBlock in dayTimeBlocks)
+            var settings = _dbContext.Settings.FirstOrDefault();
+            var result = new Dictionary<WeekDay, string>();
+            var currentDay = DateTime.Now.DayOfWeek;
+            var daysTillCurrentDay = currentDay - DayOfWeek.Monday;
+            var workingDays = _dbContext.WeekDays;
+            var previousDays = _dbContext.DateEntries
+                .Where(x => x.StartTime.Date >= DateTime.Today.Date.AddDays(-daysTillCurrentDay) &&
+                            x.StartTime.Date < DateTime.Today.Date).OrderByDescending(x => x.StartTime)
+                .GroupBy(x => x.StartTime.Date);
+            int missingDays;
+            if (previousDays.Any())
             {
-                if (timeBlock.StartTime is { Hour: 0, Minute: 0, Second: 0 } && timeBlock.EndTime is { Hour: 23, Minute: 59, Second: 59 } && !dayOfWeek.IsWorkDay) 
+                foreach (var day in previousDays)
                 {
+                    var dayOfWeek = workingDays.FirstOrDefault(x => x.DayOfWeek == (int)day.Key.DayOfWeek);
+                    if (dayOfWeek is null) continue;
+                    var dayTimeBlocks = day.ToList();
+                    TimeSpan timeWorked = default;
+                    foreach (var timeBlock in dayTimeBlocks)
+                    {
+                        if (timeBlock.StartTime is { Hour: 0, Minute: 0, Second: 0 } && timeBlock.EndTime is { Hour: 23, Minute: 59, Second: 59 } && !dayOfWeek.IsWorkDay)
+                        {
+                            result.Add(dayOfWeek, TimeSpanHelper.GetFormattedTimeSpan(timeWorked));
+                        }
+                        if (timeBlock.Tags.CaseInsensitiveContains(PipelineConstants.Break)) continue;
+                        if (!timeBlock.EndTime.HasValue) continue;
+                        timeWorked += timeBlock.EndTime.Value - timeBlock.StartTime;
+                    }
+                    if (settings is not null && settings.AddLunchBreaks && dayOfWeek.IsWorkDay && !dayTimeBlocks.Contains(x => x.Tags.Exists(t => t.CaseInsensitiveContains(PipelineConstants.Break) || t.CaseInsensitiveContains(PipelineConstants.DayOff))))
+                    {
+                        timeWorked -= TimeSpan.FromMinutes(settings.LunchBreakInMinutes);
+                    }
                     result.Add(dayOfWeek, TimeSpanHelper.GetFormattedTimeSpan(timeWorked));
                 }
-                timeWorked += timeBlock.EndTime!.Value - timeBlock.StartTime;
+                missingDays = 7 - result.Count;
             }
-            result.Add(dayOfWeek, TimeSpanHelper.GetFormattedTimeSpan(timeWorked));
-        }
-        var missingDays = 7 - result.Count;
-        
-        if(missingDays == 0) return result;
-
-        for (var i = 1; i <= 7; i++)
-        {
-            if(result.Keys.Any(x => x.Id == i)) continue;
-
-            var today = i;
-            var dayOfWeek = workingDays.FirstOrDefault(x => x.Id == today);
-            if (dayOfWeek is null) continue;
-            result.Add(new WeekDay
+            else
             {
-                Id = today,
-                DayOfWeek = today == 7 ? 0 : today,
-                Hours = dayOfWeek.Hours, 
-                Minutes = dayOfWeek.Minutes, 
-                Name = dayOfWeek.Name, 
-                IsWorkDay = dayOfWeek.IsWorkDay
-                
-            }, TimeSpanHelper.GetFormattedTimeSpan(new TimeSpan(0, 0, 0)));
+                missingDays = 7;
+            }
+
+            if (missingDays == 0) return result;
+
+            for (var i = 1; i <= 7; i++)
+            {
+                if (result.Keys.Any(x => x.Id == i)) continue;
+
+                var today = i;
+                var dayOfWeek = workingDays.FirstOrDefault(x => x.Id == today);
+                if (dayOfWeek is null) continue;
+                result.Add(new WeekDay
+                {
+                    Id = today,
+                    DayOfWeek = today == 7 ? 0 : today,
+                    Hours = dayOfWeek.Hours,
+                    Minutes = dayOfWeek.Minutes,
+                    Name = dayOfWeek.Name,
+                    IsWorkDay = dayOfWeek.IsWorkDay
+
+                }, TimeSpanHelper.GetFormattedTimeSpan(new TimeSpan(0, 0, 0)));
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Something went wrong in the {method}.", nameof(GetThisWeekPreviousDaysWorkHoursAsString));
         }
 
-        return result;
+        return new Dictionary<WeekDay, string>();
     }
 
     public void DeleteEntry(Guid id)
@@ -173,7 +208,7 @@ public class DateEntryController : IDateEntryController
     public void UpdateDateEntry(Guid id, DateEntry entry)
     {
         var savedEntry = _dbContext.DateEntries.FirstOrDefault(x => x.Id == id);
-        if(savedEntry is null) return;
+        if (savedEntry is null) return;
         savedEntry.StartTime = entry.StartTime;
         savedEntry.EndTime = entry.EndTime;
         savedEntry.Description = entry.Description;

@@ -18,7 +18,7 @@ public class QuarterlyHoursController : IQuarterlyHoursController
     {
         return _dbContext.QuarterlyHours.FirstOrDefault() ?? new QuarterlyHourCount
         {
-            Hours = 0
+            Hours = new TimeSpan(0,0,0)
         };
     }
 }

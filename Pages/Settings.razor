@@ -134,7 +134,13 @@
         <div style="display: flex; flex-direction: column;">
             @foreach (var tag in SettingViewModel.Tags)
             {
-                <div class="tag" style="background-color: @tag.Colour; position: relative;"><span>@tag.Name</span><img style="position: absolute; right: 10px; cursor: pointer" alt="delete" width="20" height="20" src="/images/Delete.png" @onclick="() => TagDelete(tag.Id)"/></div>
+                <div class="tag" style="background-color: @tag.Colour; position: relative;">
+                    <span>@tag.Name</span>
+                    @if (!tag.IsDefault)
+                    {
+                        <img style="position: absolute; right: 10px; cursor: pointer" alt="delete" width="20" height="20" src="/images/Delete.png" @onclick="() => TagDelete(tag.Id)"/>
+                    }
+                </div>
             }
         </div>
     </article>

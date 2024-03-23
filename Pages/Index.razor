@@ -18,18 +18,21 @@
                 <h5>Hours: </h5>
             </td>
             <td style="width: 10%; vertical-align: middle;height=75px; text-align: left">
-                @switch (QuarterlyHours)
+                @if (QuarterlyHoursInTimeSpan < TimeSpan.Zero)
                 {
-                    case >= 0 and <= 10:
-                        <h5 style="color:green;">@QuarterlyHoursOverview</h5>
-                        break;
-                    case > 10:
-                        <h5 style="color:orange;">@QuarterlyHoursOverview</h5>
-                        break;
-                    case < 0:
-                        <h5 style="color:red;">@QuarterlyHoursOverview</h5>
-                        break;
+                    <h5 style="color:red;">@QuarterlyHoursInTimeSpan.ToString()</h5>
                 }
+                else
+                    switch (QuarterlyHoursInTimeSpan.Hours)
+                    {
+                        case >= 0 and <= 10:
+                            <h5 style="color:green;">@QuarterlyHoursInTimeSpan.ToString()</h5>
+                            break;
+                        case > 10:
+                            <h5 style="color:orange;">@QuarterlyHoursInTimeSpan.ToString()</h5>
+                            break;
+                    }
+
             </td>
         </tr>
     </table>
@@ -44,14 +47,14 @@
         {
             <span @onclick="@ToggleTimer"><img src="Images/Start.png" width="100px" /></span>
         }
-        <span><b>@(ElapsedTimeCurrentTimeBlock)</b></span><br/>
+        <span><b>@(ElapsedTimeCurrentTimeBlock)</b></span><br />
         <span>@CurrentDescription</span>
         @if (PipelineTimer is null || !IsRunning)
         {
             <div>
                 <input type="text" @bind="Task" style="width: 75%; border-radius: 10px; margin-left: 5px;" placeholder=" Task description" />
             </div>
-            <div style="display: flex; flex-direction: column; margin-top: 20px;" >
+            <div style="display: flex; flex-direction: column; margin-top: 20px;">
                 @foreach (var tag in Tags)
                 {
                     @if (tag.Selected)
@@ -67,37 +70,49 @@
         }
     </article>
     <article style="width: 75%;">
-
-        @if (TodaysEntries.Any())
-        {
-            <h1><b>@TodaysEntries.FirstOrDefault()!.StartTime.DayOfWeek</b> @TodaysEntries.FirstOrDefault()!.StartTime.ToString("MMMM d, yyyy")</h1>
-            <div style="display: flex; flex-direction: row;">
-                @foreach(var previousDay in PreviousDaysWorkHours)
-                {
-                    <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek != Today ? (previousDay.Key.IsWorkDay ? "greyBlock" : "greyStripes") : "darkGreyBlock")">
-                        <div id="weekdayDiv">
+        <h1><b>@DateTime.Today.DayOfWeek</b> @DateTime.Today.ToString("MMMM d, yyyy")</h1>
+        <hr />
+        <div style="display: flex; flex-direction: row;">
+            @foreach (var previousDay in PreviousDaysWorkHours)
+            {
+                <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek != Today ? (previousDay.Key.IsWorkDay ? "greyBlock" : "greyStripes") : "darkGreyBlock")">
+                    <div id="weekdayDiv">
                         @switch (previousDay.Key.Id)
                         {
                             case 1:
-                                <b>Mo</b><br/>
+                                <b>Mo</b>
+
+                                <br />
                                 break;
                             case 2:
-                                <b>Tu</b><br/>
+                                <b>Tu</b>
+
+                                <br />
                                 break;
                             case 3:
-                                <b>We</b><br/>
+                                <b>We</b>
+
+                                <br />
                                 break;
                             case 4:
-                                <b>Th</b><br/>
+                                <b>Th</b>
+
+                                <br />
                                 break;
                             case 5:
-                                <b>Fr</b><br/>
+                                <b>Fr</b>
+
+                                <br />
                                 break;
                             case 6:
-                                <b>Sa</b><br/>
+                                <b>Sa</b>
+
+                                <br />
                                 break;
                             case 7:
-                                <b>Su</b><br/>
+                                <b>Su</b>
+
+                                <br />
                                 break;
                         }
                         @if (previousDay.Key.DayOfWeek == Today)
@@ -108,17 +123,19 @@
                         {
                             @previousDay.Value
                         }
-                        </div>
-                    </article>
-                }
-            </div>
+                    </div>
+                </article>
+            }
+        </div>
+        @if (TodaysEntries.Any())
+        {
             <table>
                 @foreach (var entry in TodaysEntries)
                 {
                     <tr>
                         <td width="70%">
 
-                            @if (!EditEntryId.Equals(entry.Id) )
+                            @if (!EditEntryId.Equals(entry.Id))
                             {
                                 <b>@entry.Description</b>
                                 <br />
@@ -133,10 +150,11 @@
 
                         </td>
                         <td>
-                            
+
                             @if (!EditEntryId.Equals(entry.Id))
                             {
-                                @($"{entry.StartTime:HH:mm} - {entry.EndTime.Value:HH:mm}");
+                                @($"{entry.StartTime:HH:mm} - {entry.EndTime.Value:HH:mm}")
+                                ;
 
                             }
                             else
@@ -144,11 +162,11 @@
                                 <input type="time" @bind="entry.StartTime" @bind:format="HH:mm:ss" />
 
                                 <input type="time" @bind="entry.EndTime" @bind:format="HH:mm:ss" />
-                                 
+
                             }
                         </td>
                         <td>
-                            @if (!EditEntryId.Equals(entry.Id) )
+                            @if (!EditEntryId.Equals(entry.Id))
                             {
                                 <span @onclick="() => EditEntry(entry.Id)"><img src="Images/Edit.png" width="30px" /></span>
                             }
