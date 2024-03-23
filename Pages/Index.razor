@@ -75,7 +75,7 @@
         <div style="display: flex; flex-direction: row;">
             @foreach (var previousDay in PreviousDaysWorkHours)
             {
-                <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek != Today ? (previousDay.Key.IsWorkDay ? "greyBlock" : "greyStripes") : "darkGreyBlock")">
+                <article style="width: 10%; " class="@(previousDay.Key.DayOfWeek != Today ? (previousDay.Key.IsWorkDay ? "greyBlock" : "greyStripes") : (previousDay.Key.IsWorkDay ? "darkGreyBlock" : "whiteStripes"))">
                     <div id="weekdayDiv">
                         @switch (previousDay.Key.Id)
                         {

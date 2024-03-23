@@ -4,7 +4,7 @@ namespace PipelineApp2._0.Controllers;
 
 public interface IDateEntryController
 {
-    DateEntry GetToday();
+    DateEntry GetOrCreateToday();
     DateEntry? AddNewStartTime(Guid dateId, DateTime startTime, string task, List<string> tags);
     bool UpdateEndTime(Guid dateId, DateTime endTime);
     TimeSpan GetTotalWorkedTimeToday();
@@ -13,4 +13,5 @@ public interface IDateEntryController
     void DeleteEntry(Guid id);
     List<Tag> GetAllTags();
     void UpdateDateEntry(Guid id, DateEntry entry);
+    void CalculateQuarterlyHours();
 }

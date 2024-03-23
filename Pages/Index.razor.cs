@@ -51,7 +51,7 @@ public partial class Index : ComponentBase
 
     protected override void OnInitialized()
     {
-        var today = DateEntryController.GetToday();
+        var today = DateEntryController.GetOrCreateToday();
         CurrentDateEntryViewModel = DateEntryViewModel.MapToDateEntry(today);
         if (!today.StartTime.TimeOfDay.Equals(new TimeSpan(0,0,0)) && today.EndTime == null)
         {
@@ -176,6 +176,7 @@ public partial class Index : ComponentBase
         DateEntryController.DeleteEntry(id);
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
         GetTotalElapsedTime();
+        DateEntryController.CalculateQuarterlyHours();
     }
 
     private void EditEntry(Guid id)
@@ -200,6 +201,7 @@ public partial class Index : ComponentBase
         DateEntryController.UpdateDateEntry(id, dateEntry);
         TodaysEntries = DateEntryController.GetAllEntriesForToday().Select(DateEntryViewModel.MapToDateEntry).ToList();
         GetTotalElapsedTime();
+        DateEntryController.CalculateQuarterlyHours();
         Tags.ForEach(x => x.Selected = false);
     }
 }

@@ -21,7 +21,12 @@ article {
     }
 
     article.greyStripes {
-        background: repeating-linear-gradient( 45deg, #ababab, #ababab 2px, #E9EAEA 2px, #E9EAEA 3px);
+        background: repeating-linear-gradient( 45deg, #ababab, #ababab 2px, #FFFFFF 2px, #FFFFFF 3px);
+        border-radius: 5px;
+        box-shadow: 4px 1px 10px #cccccc;
+    }
+    article.whiteStripes {
+        background: repeating-linear-gradient( 45deg, #ababab, #ababab 2px, #FFFFFF 2px, #000000 3px);
         border-radius: 5px;
         box-shadow: 4px 1px 10px #cccccc;
     }

@@ -1,9 +1,8 @@
+using PipelineApp2._0.Contants;
 using PipelineApp2._0.Domain;
+using PipelineApp2._0.Extensions;
 using PipelineApp2._0.Helpers;
 using PipelineApp2._0.Persistence;
-using System;
-using PipelineApp2._0.Contants;
-using PipelineApp2._0.Extensions;
 
 namespace PipelineApp2._0.Controllers;
 
@@ -17,24 +16,15 @@ public class DateEntryController : IDateEntryController
         _dbContext = dbContext;
         _logger = logger;
     }
-    public DateEntry GetToday()
+    public DateEntry GetOrCreateToday()
     {
         try
-        {
-            var today = _dbContext.DateEntries.Where(x => x.StartTime.Date.Equals(DateTime.Today.Date)).OrderByDescending(x => x.StartTime).FirstOrDefault();
-            if (today is null)
-            {
-                today = new DateEntry { StartTime = DateTime.Now };
-                var savedEntity = _dbContext.Add(today);
-                _dbContext.SaveChanges();
-                today = savedEntity.Entity;
-            }
-            _logger.LogDebug("Getting today entry successful.");
-            return today;
+        {  
+            return _dbContext.DateEntries.FirstOrDefault(x => x.StartTime.Date.Equals(DateTime.Today.Date)) ?? CreateNewDay();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Something went wrong in the {method}.", nameof(GetToday));
+            _logger.LogError(ex, "Something went wrong in the {method}.", nameof(GetOrCreateToday));
             return new DateEntry();
         }
     }
@@ -215,5 +205,78 @@ public class DateEntryController : IDateEntryController
         savedEntry.Tags = entry.Tags;
         _dbContext.Update(savedEntry);
         _dbContext.SaveChanges();
+    }
+
+    public void CalculateQuarterlyHours()
+    {
+        try
+        {
+            var settings = _dbContext.Settings.FirstOrDefault();
+            var previousDays = _dbContext.DateEntries.Where(x => x.StartTime.Date < DateTime.Today.Date && x.EndTime.HasValue).GroupBy(x => x.StartTime.Date);
+            var workingDays = _dbContext.WeekDays;
+            var savedQuarterlyHours = _dbContext.QuarterlyHours.FirstOrDefault();
+            TimeSpan quarterlyHoursInTimeSpan = default;
+            foreach (var day in previousDays)
+            {
+                var dayOfWeek = workingDays.FirstOrDefault(x => x.DayOfWeek == (int)day.Key.DayOfWeek);
+                if (dayOfWeek is null) continue;
+                var dayTimeBlocks = day.ToList();
+                TimeSpan timeWorked = default;
+                foreach (var timeBlock in dayTimeBlocks)
+                {
+                    if (timeBlock.StartTime is { Hour: 0, Minute: 0, Second: 0 } && timeBlock.EndTime is { Hour: 23, Minute: 59, Second: 59 } && !dayOfWeek.IsWorkDay) continue;
+                    if (timeBlock.Tags.CaseInsensitiveContains(PipelineConstants.Break)) continue;
+                    timeWorked += timeBlock.EndTime!.Value - timeBlock.StartTime;
+                }
+                if (dayOfWeek.IsWorkDay && settings is not null && settings.AddLunchBreaks && dayOfWeek.IsWorkDay && !dayTimeBlocks.Contains(x => x.Tags.Exists(t => t.CaseInsensitiveContains(PipelineConstants.Break) || t.CaseInsensitiveContains(PipelineConstants.DayOff))))
+                {
+                    timeWorked -= TimeSpan.FromMinutes(settings.LunchBreakInMinutes);
+                }
+                var timeHasToBeWorked = TimeSpan.FromHours(dayOfWeek.Hours) + TimeSpan.FromHours(dayOfWeek.Minutes);
+                quarterlyHoursInTimeSpan += timeWorked - timeHasToBeWorked;
+            }
+
+            if (savedQuarterlyHours is null)
+            {
+                _dbContext.QuarterlyHours.Add(new QuarterlyHourCount
+                {
+                    Hours = quarterlyHoursInTimeSpan
+                });
+            }
+            else
+            {
+                savedQuarterlyHours.Hours = quarterlyHoursInTimeSpan;
+                _dbContext.QuarterlyHours.Update(savedQuarterlyHours);
+            }
+
+            _dbContext.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred in method {name}.", nameof(CalculateQuarterlyHours));
+        }
+    }
+
+    private DateEntry CreateNewDay()
+    {
+        var weekDay = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek.Equals(DateTime.Today.DayOfWeek));
+        DateEntry today;
+        if (weekDay is not null && weekDay.IsWorkDay)
+        {
+            today = new DateEntry { StartTime = DateTime.Today };
+        }
+        else
+        {
+            today = new DateEntry
+            {
+                StartTime = DateTime.Today,
+                EndTime = DateTime.Today.AddHours(23).AddMinutes(59).AddSeconds(59),
+                Tags = new List<string> { PipelineConstants.DayOff },
+                Description = PipelineConstants.DayOffTitle
+            };
+        }
+        _dbContext.Add(today);
+        _dbContext.SaveChanges();
+        return today;
     }
 }
