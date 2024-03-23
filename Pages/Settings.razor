@@ -95,7 +95,7 @@
                 <div>
                     @if (!Editing)
                     {
-                        @(SettingViewModel.AddLunchBreaks ? $"Adding lunch breaks of {SettingViewModel.LunchBreakInMinutes} minutes" : "Not adding lunch breaks... yet")
+                        @(SettingViewModel.AddLunchBreaks ? $"Automatically adding lunch breaks of {SettingViewModel.LunchBreakInMinutes} minutes" : "Not adding any lunch breaks automatically")
                     }
                     else
                     {
