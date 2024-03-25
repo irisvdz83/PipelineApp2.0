@@ -28,6 +28,43 @@ public class DateEntryController : IDateEntryController
             return new DateEntry();
         }
     }
+
+    public void AddMissingDays()
+    {
+        try
+        {
+            var lastEntry = _dbContext.DateEntries.Where(x => x.StartTime.Date != DateTime.Today.Date).OrderByDescending(x => x.StartTime).FirstOrDefault();
+            if (lastEntry is null) return;
+            var daysBetween = (DateTime.Today.Date - lastEntry.StartTime.Date).TotalDays;
+            if (daysBetween < 1) return;
+            
+            for (var i = 1; i < daysBetween; i++)
+            {
+                var newDay = lastEntry.StartTime.Date.AddDays(i);
+                var weekDay = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek == (int)newDay.DayOfWeek);
+                if (weekDay is null) continue;
+                if (weekDay.IsWorkDay)
+                {
+                    _dbContext.Add(new DateEntry { StartTime = newDay.AddHours(8).AddMinutes(0).AddSeconds(0), EndTime = newDay.AddHours(0).AddMinutes(1).AddSeconds(0) });
+                }
+                else
+                {
+                    _dbContext.Add(new DateEntry
+                    {
+                        StartTime = newDay.AddHours(0).AddMinutes(0).AddSeconds(0),
+                        EndTime = newDay.AddHours(23).AddMinutes(59).AddSeconds(59),
+                        Tags = new List<string> { PipelineConstants.DayOff },
+                        Description = PipelineConstants.DayOffTitle
+                    });
+                }
+            }
+            _dbContext.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Something went wrong in the {method}.", nameof(AddMissingDays));
+        }
+    }
     public DateEntry? AddNewStartTime(Guid dateId, DateTime startTime, string task, List<string> tags)
     {
         try
@@ -87,9 +124,10 @@ public class DateEntryController : IDateEntryController
     {
         var settings = _dbContext.Settings.FirstOrDefault();
         var today = _dbContext.DateEntries.Where(x => x.StartTime.Date.Equals(DateTime.Today.Date) && x.EndTime.HasValue).OrderByDescending(x => x.StartTime);
-        var dayOfWeek = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek == (int)DateTime.Today.Date.DayOfWeek);
-
         TimeSpan totalWorkedTime = default;
+        if (!today.Any()) return totalWorkedTime;
+        
+        var dayOfWeek = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek == (int)DateTime.Today.Date.DayOfWeek);
         foreach (var todayEntry in today)
         {
             if (todayEntry.StartTime is { Hour: 0, Minute: 0, Second: 0 } && todayEntry.EndTime is { Hour: 23, Minute: 59, Second: 59 } && !dayOfWeek!.IsWorkDay) continue;
@@ -259,7 +297,7 @@ public class DateEntryController : IDateEntryController
 
     private DateEntry CreateNewDay()
     {
-        var weekDay = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek.Equals(DateTime.Today.DayOfWeek));
+        var weekDay = _dbContext.WeekDays.FirstOrDefault(x => x.DayOfWeek == (int)DateTime.Today.DayOfWeek); 
         DateEntry today;
         if (weekDay is not null && weekDay.IsWorkDay)
         {

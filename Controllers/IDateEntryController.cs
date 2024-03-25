@@ -14,4 +14,5 @@ public interface IDateEntryController
     List<Tag> GetAllTags();
     void UpdateDateEntry(Guid id, DateEntry entry);
     void CalculateQuarterlyHours();
+    void AddMissingDays();
 }

@@ -1,9 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PipelineApp2._0.Contants;
-using PipelineApp2._0.Controllers;
+﻿using PipelineApp2._0.Controllers;
 using PipelineApp2._0.Domain;
-using PipelineApp2._0.Extensions;
-using PipelineApp2._0.Persistence;
 
 namespace PipelineApp2._0.Services;
 
@@ -62,8 +58,8 @@ public sealed class PipelineService : BackgroundService
     {
         try
         {
-
             var today = controller.GetOrCreateToday();
+            controller.AddMissingDays();
             controller.CalculateQuarterlyHours();
             return today;
         }
